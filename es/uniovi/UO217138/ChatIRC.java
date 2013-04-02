@@ -17,7 +17,13 @@ public class ChatIRC {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+
+		Pilafifo bufferentrada = new Pilafifo();
+		Pilafifo buffersalida = new Pilafifo();
+		Network networksalida = new Network();
+		Network networkentrada = new Network();
+		SalidaRed salidared = new SalidaRed(buffersalida, networksalida);
+		EntradaRed entradared = new EntradaRed(bufferentrada, networkentrada);
 
 	}
 

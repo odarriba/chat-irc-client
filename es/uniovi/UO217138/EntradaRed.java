@@ -3,30 +3,49 @@ package es.uniovi.UO217138;
 import java.util.StringTokenizer;
 
 public class EntradaRed extends Thread {
-	private Pilafifo bufferentrada;
-	private String entrada;
-	private String comando;
+	private Pilafifo buffersalida;
+	private String salida;
+
 	private String usuario;
 	private String sala;
 	private String mensaje;
-	private Network salidadered;
+	private Network entradadered;
 
-	public EntradaRed(Pilafifo bufferentrada, Network salidadered) {
-		this.bufferentrada = bufferentrada;
-		this.start();
-		this.salidadered = salidadered;
+	public EntradaRed(Pilafifo buffersalida, Network entradadered) {
+		this.buffersalida = buffersalida;
+
+		this.entradadered = entradadered;
+		start();
 	}
 
 	public void run() {
 
 		while (true) {
+
 			try {
-				synchronized (bufferentrada) {
+				salida = entradadered.recv();
+			} catch (IllegalStateException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
-					if (bufferentrada.vacia())
-						bufferentrada.wait();
+			StringTokenizer st = new StringTokenizer(salida, ";");
 
-					entrada = bufferentrada.sacar();
+			usuario = st.nextToken();
+
+			sala = st.nextToken();
+
+			mensaje = st.nextToken();
+
+			salida = "/MSG " + usuario + " " + sala + " " + mensaje;
+
+			try {
+				synchronized (buffersalida) {
+
+					buffersalida.meter(salida);
 
 				}
 			} catch (InterruptedException e) {
@@ -34,35 +53,8 @@ public class EntradaRed extends Thread {
 				e.printStackTrace();
 			}
 
-			StringTokenizer st = new StringTokenizer(entrada);
-			comando = st.nextToken();
-			usuario = st.nextToken();
-			if (st.hasMoreTokens()) {
-				sala = st.nextToken();
-				if (st.hasMoreTokens()) {
-					mensaje = st.nextToken();
-				}
-			}
-
-			if (comando.equals("/MSG")) {
-				try {
-					salidadered.send(comando + ";" + usuario + ";" + sala + ";"
-							+ mensaje);
-				} catch (IllegalStateException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			
-			
-			
-			
-			
-			
-			
 		}
+
 	}
+
 }
