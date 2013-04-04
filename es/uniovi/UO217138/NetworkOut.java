@@ -54,8 +54,8 @@ public class NetworkOut extends Thread {
 			 */
 			if (this.message.getType() == Message.TYPE_MSG) {
 				try {
-					this.netInterface.send("/MSG;" + this.message.getNick() + ";" + this.message.getRoom() + ";"
-							+ this.message.getMessage());
+					this.netInterface.send("/MSG;" + this.message.getRoom() + ";"
+							+ this.message.getNick() + ";" + this.message.getMessage());
 				} catch (IllegalStateException e) {
 					e.printStackTrace();
 				} catch (InterruptedException e) {

@@ -62,6 +62,7 @@ public class NetworkIn extends Thread {
 			StringTokenizer st = new StringTokenizer(netData, ";");
 
 			// Se debe comprobar que se reciben 3 o más parámetros
+			st.nextToken();
 			if (st.countTokens() >= 3) {
 				this.message.setType(Message.TYPE_MSG);
 				this.message.setNick(st.nextToken());

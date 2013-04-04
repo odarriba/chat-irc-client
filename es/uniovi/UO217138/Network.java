@@ -99,7 +99,7 @@ public class Network extends Thread {
 				String nick = "Usuario" + n;
 				String room = ROOM[n % 2];
 				String message = "Mensaje número " + i;
-				String msg = nick + ";" + room + ";" + message;
+				String msg = "/MSG;"+nick + ";" + room + ";" + message;
 				// Encolamos
 				msgQueue.put(msg);
 				i = i + 1;
