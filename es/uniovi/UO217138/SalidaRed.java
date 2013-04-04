@@ -24,10 +24,10 @@ public class SalidaRed extends Thread {
 			try {
 				synchronized (bufferentrada) {
 
-					if (bufferentrada.vacia())
+					if (bufferentrada.empty())
 						bufferentrada.wait();
 
-					entrada = bufferentrada.sacar();
+					entrada = bufferentrada.get();
 
 				}
 			} catch (InterruptedException e) {

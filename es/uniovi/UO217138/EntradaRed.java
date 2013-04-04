@@ -45,7 +45,7 @@ public class EntradaRed extends Thread {
 			try {
 				synchronized (buffersalida) {
 
-					buffersalida.meter(salida);
+					buffersalida.put(salida);
 
 				}
 			} catch (InterruptedException e) {
