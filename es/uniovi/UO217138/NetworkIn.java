@@ -27,7 +27,7 @@ public class NetworkIn extends Thread {
 				e1.printStackTrace();
 			}
 
-			this.message = new Message(); //Iniciar el objeto que contendrá los datos en el buffer
+			this.message = new Message(); // Iniciar el objeto que contendrá los datos en el buffer
 			
 			/*
 			 * A partir de este punto es código que sólo sirve en este primer momento, sin tener

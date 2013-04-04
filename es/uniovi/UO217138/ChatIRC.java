@@ -26,6 +26,7 @@ public class ChatIRC {
 		NetworkIn netIn = new NetworkIn(bufferResponses, network);
 		
 		netIn.start();
+		netOut.start();
 	}
 	
 	public static void main(String[] args) {
