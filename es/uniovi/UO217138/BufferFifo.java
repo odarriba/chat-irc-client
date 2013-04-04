@@ -25,7 +25,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  * usando sem‡foros y sincronizaci—n.
  */
 public class BufferFifo {
-	private ArrayBlockingQueue<String> msgQueue;
+	private ArrayBlockingQueue<Message> msgQueue;
 
 	/*
 	 * Funci—n get();
@@ -34,7 +34,7 @@ public class BufferFifo {
 	 * hilo hasta que se obtenga un mensaje o de interrumpa con
 	 * una excepci—n, que se devolver‡ al llamante.
 	 */
-	public String get() throws InterruptedException {
+	public Message get() throws InterruptedException {
 		return msgQueue.take();
 	}
 
@@ -45,8 +45,8 @@ public class BufferFifo {
 	 * que se pueda bloquear el buffer para acceder de forma
 	 * s’ncrona (o que sea interrumpido por una excepci—n).
 	 */
-	public void put(String comando) throws InterruptedException {
-		msgQueue.put(comando);
+	public void put(Message mensaje) throws InterruptedException {
+		msgQueue.put(mensaje);
 	}
 	
 	/*
