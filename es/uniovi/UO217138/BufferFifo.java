@@ -27,7 +27,31 @@ import java.util.concurrent.ArrayBlockingQueue;
  * usando sem‡foros y sincronizaci—n.
  */
 public class BufferFifo {
-	private ArrayBlockingQueue<Message> msgQueue;
+	private ArrayBlockingQueue<Message> buffer;
+	private static final int DEFAULT_SIZE = 20;
+	
+	/*
+	 * Constructor de la clase BufferFifo
+	 * 
+	 * Si no se pasa par‡metro de tama–o, usar el de por defecto.
+	 */
+	BufferFifo() {
+		this.buffer = new ArrayBlockingQueue<Message>(DEFAULT_SIZE);
+	}
+	
+	/*
+	 * Constructor de la clase BufferFifo
+	 * 
+	 * Si se pasa par‡metro de tama–o, usar el recibido.
+	 * Si se recibe un valor <= 0, utilizar el valor por defecto
+	 */
+	BufferFifo(Integer size) {
+		if (size <= 0) {
+			this.buffer = new ArrayBlockingQueue<Message>(DEFAULT_SIZE);
+		} else {
+			this.buffer = new ArrayBlockingQueue<Message>(size);
+		}
+	}
 
 	/*
 	 * Funci—n get();
@@ -37,7 +61,7 @@ public class BufferFifo {
 	 * una excepci—n, que se devolver‡ al llamante.
 	 */
 	public Message get() throws InterruptedException {
-		return msgQueue.take();
+		return this.buffer.take();
 	}
 
 	/*
@@ -48,7 +72,7 @@ public class BufferFifo {
 	 * s’ncrona (o que sea interrumpido por una excepci—n).
 	 */
 	public void put(Message mensaje) throws InterruptedException {
-		msgQueue.put(mensaje);
+		this.buffer.put(mensaje);
 	}
 	
 	/*
@@ -58,7 +82,7 @@ public class BufferFifo {
 	 * momento de la consulta.
 	 */
 	public Integer numElements() {
-		return msgQueue.size();
+		return this.buffer.size();
 	}
 
 	/*

@@ -21,12 +21,16 @@ public class ChatIRC {
 	ChatIRC(String nick) {
 		BufferFifo bufferResponses = new BufferFifo(); // Buffer que almacena las respuestas que vienen de la red
 		BufferFifo bufferCommands = new BufferFifo(); // Buffer que almacena los comandos del usuario
+		
 		Network network = new Network();
 		NetworkOut netOut = new NetworkOut(bufferCommands, network);
 		NetworkIn netIn = new NetworkIn(bufferResponses, network);
 		
+		UserOut userOut = new UserOut(bufferResponses);
+
 		netIn.start();
 		netOut.start();
+		userOut.start();
 	}
 	
 	public static void main(String[] args) {
