@@ -5,16 +5,16 @@
  * Clase ChatIRC
  * 
  * Autores:
- *  - Lucas çlvarez
- *  - îscar de Arriba
- *  - Estefan’a Gonz‡lez
+ *  - Lucas ï¿½lvarez
+ *  - ï¿½scar de Arriba
+ *  - Estefanï¿½a Gonzï¿½lez
  */
 package es.uniovi.UO217138;
 
 /*
  * Clase ChatIRC
- * Esta clase actœa como clase principal del cliente, leyendo los par‡metros necesarios
- * de la ejecuci—n y creando los hilos y los objetos intermedios necesarios.
+ * Esta clase actï¿½a como clase principal del cliente, leyendo los parï¿½metros necesarios
+ * de la ejecuciï¿½n y creando los hilos y los objetos intermedios necesarios.
  */
 public class ChatIRC {
 	
@@ -22,13 +22,15 @@ public class ChatIRC {
 		BufferFifo bufferResponses = new BufferFifo(); // Buffer que almacena las respuestas que vienen de la red
 		BufferFifo bufferCommands = new BufferFifo(); // Buffer que almacena los comandos del usuario
 		Network network = new Network();
-		SalidaRed netIn = new SalidaRed(bufferCommands, network);
-		EntradaRed netOut = new EntradaRed(bufferResponses, network);
+		NetworkOut netOut = new NetworkOut(bufferCommands, network);
+		NetworkIn netIn = new NetworkIn(bufferResponses, network);
+		
+		netIn.start();
 	}
 	
 	public static void main(String[] args) {
 		if (args.length < 1) {
-			System.err.println("Cantidad de par‡metros incorrectos.\n\nSintaxis:\n  java ChatIRC <nickname>");
+			System.err.println("Cantidad de parï¿½metros incorrectos.\n\nSintaxis:\n  java ChatIRC <nickname>");
 			return;
 		}
 		
