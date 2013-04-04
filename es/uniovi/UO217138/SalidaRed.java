@@ -3,7 +3,7 @@ package es.uniovi.UO217138;
 import java.util.StringTokenizer;
 
 public class SalidaRed extends Thread {
-	private Pilafifo bufferentrada;
+	private BufferFifo bufferentrada;
 	private String entrada;
 	private String comando;
 	private String usuario;
@@ -11,7 +11,7 @@ public class SalidaRed extends Thread {
 	private String mensaje;
 	private Network salidadered;
 
-	public SalidaRed(Pilafifo bufferentrada, Network salidadered) {
+	public SalidaRed(BufferFifo bufferentrada, Network salidadered) {
 		this.bufferentrada = bufferentrada;
 
 		this.salidadered = salidadered;

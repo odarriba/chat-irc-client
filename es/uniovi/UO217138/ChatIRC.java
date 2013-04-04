@@ -18,8 +18,8 @@ public class ChatIRC {
 	 */
 	public static void main(String[] args) {
 
-		Pilafifo bufferentrada = new Pilafifo();
-		Pilafifo buffersalida = new Pilafifo();
+		BufferFifo bufferentrada = new BufferFifo();
+		BufferFifo buffersalida = new BufferFifo();
 		Network networksalida = new Network();
 		Network networkentrada = new Network();
 		SalidaRed salidared = new SalidaRed(buffersalida, networksalida);
