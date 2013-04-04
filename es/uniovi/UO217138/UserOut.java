@@ -3,7 +3,7 @@ package es.uniovi.UO217138;
 public class UserOut extends Thread {
 	private BufferFifo bufferResponses;
 	
-	UserOut (BufferFifo bufferResponses) {
+	public UserOut (BufferFifo bufferResponses) {
 		this.bufferResponses = bufferResponses;
 	}
 	

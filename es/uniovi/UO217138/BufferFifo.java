@@ -35,7 +35,7 @@ public class BufferFifo {
 	 * 
 	 * Si no se pasa par‡metro de tama–o, usar el de por defecto.
 	 */
-	BufferFifo() {
+	public BufferFifo() {
 		this.buffer = new ArrayBlockingQueue<Message>(DEFAULT_SIZE);
 	}
 	
@@ -45,7 +45,7 @@ public class BufferFifo {
 	 * Si se pasa par‡metro de tama–o, usar el recibido.
 	 * Si se recibe un valor <= 0, utilizar el valor por defecto
 	 */
-	BufferFifo(Integer size) {
+	public BufferFifo(Integer size) {
 		if (size <= 0) {
 			this.buffer = new ArrayBlockingQueue<Message>(DEFAULT_SIZE);
 		} else {

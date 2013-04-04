@@ -18,7 +18,7 @@ package es.uniovi.UO217138;
  */
 public class ChatIRC {
 	
-	ChatIRC(String nick) {
+	public ChatIRC(String nick) {
 		BufferFifo bufferResponses = new BufferFifo(); // Buffer que almacena las respuestas que vienen de la red
 		BufferFifo bufferCommands = new BufferFifo(); // Buffer que almacena los comandos del usuario
 		
@@ -27,10 +27,12 @@ public class ChatIRC {
 		NetworkIn netIn = new NetworkIn(bufferResponses, network);
 		
 		UserOut userOut = new UserOut(bufferResponses);
+		UserIn userIn = new UserIn(bufferCommands, nick);
 
 		netIn.start();
 		netOut.start();
 		userOut.start();
+		userIn.start();
 	}
 	
 	public static void main(String[] args) {

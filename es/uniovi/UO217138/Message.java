@@ -40,7 +40,7 @@ public class Message {
 	 * Constructor de la clase
 	 * Genera la marca de tiempo de creaci—n del objeto
 	 */
-	Message(){
+	public Message(){
 		// Generar la marca de tiempo del mensaje
 		this.timeStamp = new Date();
 	}
