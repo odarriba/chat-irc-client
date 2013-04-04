@@ -5,9 +5,9 @@
  * Clase BufferFifo
  * 
  * Autores:
- *  - Lucas çlvarez
- *  - îscar de Arriba
- *  - Estefan’a Gonz‡lez
+ *  - Lucas Alvarez
+ *  - Oscar de Arriba
+ *  - Estefania Gonzalez
  */
 package es.uniovi.UO217138;
 

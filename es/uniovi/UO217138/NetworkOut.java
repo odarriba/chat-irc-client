@@ -2,12 +2,12 @@
  * Cliente de chat IRC-style
  * Trabajo grupal de Computadores
  * 
- * Clase BufferFifo
+ * Clase NetworkOut
  * 
  * Autores:
- *  - Lucas çlvarez
- *  - îscar de Arriba
- *  - Estefan’a Gonz‡lez
+ *  - Lucas Alvarez
+ *  - Oscar de Arriba
+ *  - Estefania Gonzalez
  */
 package es.uniovi.UO217138;
 

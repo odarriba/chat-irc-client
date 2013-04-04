@@ -2,16 +2,16 @@
  * Cliente de chat IRC-style
  * Trabajo grupal de Computadores
  * 
- * Clase ChatIRC
+ * Clase Message
  * 
  * Autores:
- *  - Lucas çlvarez
- *  - îscar de Arriba
- *  - Estefan’a Gonz‡lez
+ *  - Lucas Alvarez
+ *  - Oscar de Arriba
+ *  - Estefania Gonzalez
  */
 package es.uniovi.UO217138;
-
 import java.util.Date;
+
 /*
  * Clase Message
  * Usada para intercambiar mensajes entre los diferentes hilos de

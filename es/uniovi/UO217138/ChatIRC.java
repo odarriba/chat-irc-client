@@ -5,9 +5,9 @@
  * Clase ChatIRC
  * 
  * Autores:
- *  - Lucas ï¿½lvarez
- *  - ï¿½scar de Arriba
- *  - Estefanï¿½a Gonzï¿½lez
+ *  - Lucas Alvarez
+ *  - Oscar de Arriba
+ *  - Estefania Gonzalez
  */
 package es.uniovi.UO217138;
 
@@ -22,13 +22,16 @@ public class ChatIRC {
 		BufferFifo bufferResponses = new BufferFifo(); // Buffer que almacena las respuestas que vienen de la red
 		BufferFifo bufferCommands = new BufferFifo(); // Buffer que almacena los comandos del usuario
 		
+		// Crear interfaces de red y hilos de procesamiento
 		Network network = new Network();
 		NetworkOut netOut = new NetworkOut(bufferCommands, network);
 		NetworkIn netIn = new NetworkIn(bufferResponses, network);
 		
+		// Crear hilos de interacci—n con el usuario
 		UserOut userOut = new UserOut(bufferResponses);
 		UserIn userIn = new UserIn(bufferCommands, nick);
 
+		// Iniciar los hilos
 		netIn.start();
 		netOut.start();
 		userOut.start();

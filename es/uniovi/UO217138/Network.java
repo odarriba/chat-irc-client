@@ -1,5 +1,4 @@
 package es.uniovi.UO217138;
-
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
