@@ -1,17 +1,40 @@
+/*
+ * Cliente de chat IRC-style
+ * Trabajo grupal de Computadores
+ * 
+ * Clase BufferFifo
+ * 
+ * Autores:
+ *  - Lucas çlvarez
+ *  - îscar de Arriba
+ *  - Estefan’a Gonz‡lez
+ */
 package es.uniovi.UO217138;
 import java.util.StringTokenizer;
 
+/*
+ * Clase NetworkIn
+ * 
+ * Clase que procesa los datos entrantes desde la red 
+ * para convertirlos en respuestas de la clase Message
+ * e introducirlos dentro del buffer de respuestas.
+ */
 public class NetworkIn extends Thread {
 	private BufferFifo bufferResponses;
-
 	private Message message;
 	private Network netInterface;
 
+	/*
+	 * Constructor de la clase NetworkIn
+	 */
 	public NetworkIn(BufferFifo bufferResponses, Network netInterface) {
 		this.bufferResponses = bufferResponses;
 		this.netInterface = netInterface;
 	}
 
+	/*
+	 * MŽtodo de ejecuci—n cont’nua como Thread
+	 */
 	public void run() {
 		String netData; // Datos obtenidos desde la red
 		
@@ -60,7 +83,6 @@ public class NetworkIn extends Thread {
 				}
 			}
 		}
-
 	}
 
 }

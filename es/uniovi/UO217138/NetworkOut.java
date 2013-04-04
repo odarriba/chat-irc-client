@@ -1,15 +1,38 @@
+/*
+ * Cliente de chat IRC-style
+ * Trabajo grupal de Computadores
+ * 
+ * Clase BufferFifo
+ * 
+ * Autores:
+ *  - Lucas Álvarez
+ *  - Óscar de Arriba
+ *  - Estefanía González
+ */
 package es.uniovi.UO217138;
 
+/*
+ * Clase NetworkOut
+ * 
+ * Clase que procesa los datos procedentes del buffer de comandos
+ * en formato Message para que puedan ser enviados a la red.
+ */
 public class NetworkOut extends Thread {
 	private BufferFifo bufferCommands;
 	private Message message;
 	private Network netInterface;
 
+	/*
+	 * Constructor de la clase NetworkOut
+	 */
 	public NetworkOut(BufferFifo bufferCommands, Network netInterface) {
 		this.bufferCommands = bufferCommands;
 		this.netInterface = netInterface;
 	}
-
+	
+	/*
+	 * Método de ejecución contínua como Thread
+	 */
 	public void run() {
 		// Bucle infinito de ejecuci√≥n para la obtenci√≥n de mensajes del buffer para enviarlos.
 		while (true) {
@@ -39,7 +62,7 @@ public class NetworkOut extends Thread {
 					e.printStackTrace();
 				}
 			}
-
 		}
 	}
+	
 }

@@ -1,5 +1,5 @@
 /*
- * Cliente de chat IRC-like
+ * Cliente de chat IRC-style
  * Trabajo grupal de Computadores
  * 
  * Clase ChatIRC

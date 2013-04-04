@@ -1,5 +1,5 @@
 /*
- * Cliente de chat IRC-like
+ * Cliente de chat IRC-style
  * Trabajo grupal de Computadores
  * 
  * Clase BufferFifo
@@ -14,6 +14,8 @@ package es.uniovi.UO217138;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /*
+ * Clase BufferFifo
+ * 
  * Esta clase ser‡ usada como un elemento intermedio entre 
  * las E/S de red y de usuario para evitar bloqueos, esperas
  * o cualquier otro efecto fruto de la desincronizaci—n entre
