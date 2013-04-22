@@ -15,30 +15,33 @@ import java.util.Date;
 /*
  * Clase Message
  * Usada para intercambiar mensajes entre los diferentes hilos de
- * la aplicaci—n.
+ * la aplicaciï¿½n.
  */
 public class Message {
 	/* Tipos de mensajes que se pueden enviar/recibir */
-	public static final int TYPE_MSG = 1;
-	public static final int TYPE_JOIN = 2;
-	public static final int TYPE_LEAVE = 3;
-	public static final int TYPE_NICK = 4;
-	public static final int TYPE_LIST = 5;
-	public static final int TYPE_WHO = 6;
-	public static final int TYPE_QUIT = 7;
-	public static final int TYPE_ERROR = 8;
+	public static final byte TYPE_MSG 	= 0x01;
+	public static final byte TYPE_JOIN 	= 0x02;
+	public static final byte TYPE_LEAVE 	= 0x03;
+	public static final byte TYPE_NICK 	= 0x04;
+	public static final byte TYPE_QUIT 	= 0x05;
+	public static final byte TYPE_LIST 	= 0x10;
+	public static final byte TYPE_WHO 	= 0x11;
 	
-	private int type;
-	private String nick;
-	private String room;
-	private String message;
-	private String newNick;
-	@SuppressWarnings("unused")
+	/* Tipos de paquetes posibles */
+	public static final byte PKT_CMD 	= 0x00;
+	public static final byte PKT_INF 	= 0x01;
+	public static final byte PKT_OK 	= 0x02;
+	public static final byte PKT_ERR 	= 0x03;
+	
+	
+	private byte type;
+	private byte packet;
+	private String[] args;
 	private Date timeStamp;
 	
 	/*
 	 * Constructor de la clase
-	 * Genera la marca de tiempo de creaci—n del objeto
+	 * Genera la marca de tiempo de creaciï¿½n del objeto
 	 */
 	public Message(){
 		// Generar la marca de tiempo del mensaje
@@ -49,74 +52,117 @@ public class Message {
 	 * Getters y Setters de cada una de las variables
 	 * de los mensajes intercambiados
 	 */
-	public int getType() {
-		return type;
+	public byte getType() {
+		return this.type;
 	}
 	
-	public void setType(int type) {
-		boolean validType = false;
+	public void setType(byte type) {
+		boolean validType = true;
 		
-		// Comprobar que sea de uno de los tipos especificados
+		/* Comprobar que sea de uno de los tipos de mensaje disponibles */
 		switch(type){
 			case TYPE_MSG:
-				validType=true;
 				break;
 			case TYPE_JOIN:
-				validType=true;
 				break;
 			case TYPE_LEAVE:
-				validType=true;
 				break;
 			case TYPE_NICK:
-				validType=true;
 				break;
 			case TYPE_LIST:
-				validType=true;
 				break;
 			case TYPE_WHO:
-				validType=true;
 				break;
 			case TYPE_QUIT:
-				validType=true;
 				break;
-			case TYPE_ERROR:
-				validType=true;
+			default:
+				validType = false;
 				break;
 		}
 		
-		if (validType == true)
+		if (validType) {
 			this.type = type;
+		}
 	}
 	
-	public String getNick() {
-		return nick;
+	public byte getPacket() {
+		return this.packet;
 	}
 	
-	public void setNick(String nick) {
-		this.nick = nick;
+	public void setPacket(byte packet) {
+		boolean validPacket = true;
+		
+		/* Comprobar que sea de uno de los tipos paquetes disponibles */
+		switch(packet){
+			case PKT_CMD:
+				break;
+			case PKT_INF:
+				break;
+			case PKT_OK:
+				break;
+			case PKT_ERR:
+				break;
+			default:
+				validPacket = false;
+				break;
+		}
+		
+		if (validPacket == true) {
+			this.packet = packet;
+		}
 	}
 	
-	public String getRoom() {
-		return room;
+	public String[] getArgs() {
+		return this.args;
 	}
 	
-	public void setRoom(String room) {
-		this.room = room;
+	public void setArgs(String[] args) {
+		this.args = args;
 	}
 	
-	public String getNewNick() {
-		return newNick;
-	}
-	
-	public void setNewNick(String newNick) {
-		this.newNick = newNick;
-	}
-
-	public String getMessage() {
-		return message;
-	}
-
-	public void setMessage(String message) {
-		this.message = message;
+	public boolean esValido() {
+		boolean valido = false;
+		
+		/* Comprobar que sea de uno de los tipos paquetes disponibles */
+		switch(this.packet){
+			case PKT_CMD:
+				break;
+			case PKT_INF:
+				break;
+			case PKT_OK:
+				break;
+			case PKT_ERR:
+				break;
+			default:
+				valido = false;
+				break;
+		}
+		
+		if (valido == false) {
+			return false;
+		}
+		
+		/* Comprobar que sea de uno de los tipos de mensaje disponibles */
+		switch(this.type){
+			case TYPE_MSG:
+				break;
+			case TYPE_JOIN:
+				break;
+			case TYPE_LEAVE:
+				break;
+			case TYPE_NICK:
+				break;
+			case TYPE_LIST:
+				break;
+			case TYPE_WHO:
+				break;
+			case TYPE_QUIT:
+				break;
+			default:
+				valido = false;
+				break;
+		}
+		
+		return valido;
 	}
 }

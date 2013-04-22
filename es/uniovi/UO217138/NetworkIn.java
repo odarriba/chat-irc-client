@@ -33,7 +33,7 @@ public class NetworkIn extends Thread {
 	}
 
 	/*
-	 * Método de ejecución contínua como Thread
+	 * MÔøΩtodo de ejecuciÔøΩn contÔøΩnua como Thread
 	 */
 	public void run() {
 		String netData; // Datos obtenidos desde la red
@@ -64,14 +64,17 @@ public class NetworkIn extends Thread {
 			// Se debe comprobar que se reciben 3 o m√°s par√°metros
 			st.nextToken();
 			if (st.countTokens() >= 3) {
-				this.message.setType(Message.TYPE_MSG);
-				this.message.setNick(st.nextToken());
-				this.message.setRoom(st.nextToken());
-				this.message.setMessage(st.nextToken());
+				
+				// TODO: Cambiar la creaci√≥n de mensajes
+				
+//				this.message.setType(Message.TYPE_MSG);
+//				this.message.setNick(st.nextToken());
+//				this.message.setRoom(st.nextToken());
+//				this.message.setMessage(st.nextToken());
 				
 				while (st.hasMoreTokens()) {
 					// Posibilidad de enviar mensajes con ';' en medio.
-					this.message.setMessage(this.message.getMessage()+";"+st.nextToken());
+					//this.message.setMessage(this.message.getMessage()+";"+st.nextToken());
 				}
 	
 				try {
@@ -79,7 +82,6 @@ public class NetworkIn extends Thread {
 					this.bufferResponses.put(this.message);
 				}
 				catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

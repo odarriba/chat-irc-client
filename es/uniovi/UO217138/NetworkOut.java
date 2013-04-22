@@ -31,7 +31,7 @@ public class NetworkOut extends Thread {
 	}
 	
 	/*
-	 * MŽtodo de ejecuci—n cont’nua como Thread
+	 * Mï¿½todo de ejecuciï¿½n contï¿½nua como Thread
 	 */
 	public void run() {
 		// Bucle infinito de ejecuciÃ³n para la obtenciÃ³n de mensajes del buffer para enviarlos.
@@ -54,6 +54,7 @@ public class NetworkOut extends Thread {
 			 */
 			if (this.message.getType() == Message.TYPE_MSG) {
 				try {
+					// TODO: Hacer la conversion antes de enviar
 					this.netInterface.send("/MSG;" + this.message.getNick() + ";" + this.message.getRoom() + ";" + this.message.getMessage());
 				} catch (IllegalStateException e) {
 					e.printStackTrace();
