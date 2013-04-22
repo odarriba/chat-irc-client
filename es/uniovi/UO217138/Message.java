@@ -21,7 +21,7 @@ public class Message {
 	/* Tipos de mensajes que se pueden enviar/recibir */
 	public static final byte TYPE_MSG 	= 0x01;
 	public static final byte TYPE_JOIN 	= 0x02;
-	public static final byte TYPE_LEAVE 	= 0x03;
+	public static final byte TYPE_LEAVE = 0x03;
 	public static final byte TYPE_NICK 	= 0x04;
 	public static final byte TYPE_QUIT 	= 0x05;
 	public static final byte TYPE_LIST 	= 0x10;
