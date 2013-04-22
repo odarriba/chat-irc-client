@@ -43,7 +43,11 @@ public class BinaryProtocolConverter {
 		return salida;
 	}
 	
-	Message getMessage() throws IOException {
+	public byte[] short2bytes(short num) {
+		return new byte[]{(byte)(num & 0x00FF),(byte)((num & 0xFF00)>>8)};
+	}
+	
+	public Message getMessage() throws IOException {
 		Message salida = new Message();
 		
 		short sizeLoad;
@@ -81,5 +85,37 @@ public class BinaryProtocolConverter {
 		salida.setArgs(args);
 		
 		return salida;
+	}
+	
+	public void sendMessage(Message mensaje) throws IOException {
+		short sizeLoad = 0;
+		short numArgs = 0;
+		byte[][] argsBytes;
+		String[] args;
+		
+		args = mensaje.getArgs();
+		numArgs = (short) args.length;
+		
+		argsBytes = new byte[args.length][];
+		
+		sizeLoad +=2;
+		
+		for (int n = 0; n < args.length; n++) {
+			argsBytes[n] = args[n].getBytes("UTF-8");
+			sizeLoad += (2+argsBytes.length);
+		}
+		
+		// Escritura en el Stream
+		this.output.write(mensaje.getPacket());
+		this.output.write(mensaje.getType());
+		this.output.write(short2bytes(sizeLoad));
+		
+		if (numArgs > 0) {
+			this.output.write(short2bytes(numArgs));
+			
+			for (int n = 0; n < numArgs; n++) {
+				this.output.write(short2bytes((short) argsBytes[n].length));
+			}
+		}
 	}
 }
