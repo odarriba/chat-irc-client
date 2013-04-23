@@ -147,7 +147,7 @@ public class BinaryProtocolConverter {
 		// Inicializar el array de argumentos binarios
 		argsBytes = new byte[args.length][];
 		
-		sizeLoad +=2; //Ya van dos bytes de carga en el número de argumentos
+		sizeLoad += 2; //Ya van dos bytes de carga en el número de argumentos
 		
 		// Codificar los argumentos
 		for (int n = 0; n < args.length; n++) {
@@ -158,15 +158,15 @@ public class BinaryProtocolConverter {
 		// Escritura en el Stream
 		this.output.write(mensaje.getPacket());
 		this.output.write(mensaje.getType());
-		this.output.write(short2bytes(sizeLoad));
+		this.output.writeShort(sizeLoad);
 		
 		if (sizeLoad > 0) {
 			// Si hay argumentos, escribir el número
-			this.output.write(short2bytes(numArgs));
+			this.output.writeShort(numArgs);
 			
 			for (int n = 0; n < numArgs; n++) {
 				// Escribir la longitud del argumento y el argumento en sí.
-				this.output.write(short2bytes((short) argsBytes[n].length));
+				this.output.writeShort((short) argsBytes[n].length);
 				this.output.write(argsBytes[n]);
 			}
 		}
