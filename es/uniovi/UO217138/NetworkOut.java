@@ -10,6 +10,8 @@
  *  - Estefania Gonzalez
  */
 package es.uniovi.UO217138;
+import java.net.Socket;
+import java.io.IOException;
 
 /*
  * Clase NetworkOut
@@ -18,49 +20,57 @@ package es.uniovi.UO217138;
  * en formato Message para que puedan ser enviados a la red.
  */
 public class NetworkOut extends Thread {
+	private ChatIRC hiloPadre;
 	private BufferFifo bufferCommands;
-	private Message message;
-	private Network netInterface;
+	private Socket socket;
+	private BinaryProtocolConverter protocolConverter;
 
 	/*
 	 * Constructor de la clase NetworkOut
 	 */
-	public NetworkOut(BufferFifo bufferCommands, Network netInterface) {
+	public NetworkOut(BufferFifo bufferCommands, Socket netInterface, ChatIRC principal) {
+		this.hiloPadre = principal;
 		this.bufferCommands = bufferCommands;
-		this.netInterface = netInterface;
+		this.socket = netInterface;
+		
+		try {
+			this.protocolConverter = new BinaryProtocolConverter(this.socket.getOutputStream());
+		} catch(IOException e) {
+			System.err.println("Ha ocurrido un error al obtener el stream de salida: "+e.getMessage());
+			e.printStackTrace();
+		}
 	}
 	
 	/*
-	 * M�todo de ejecuci�n cont�nua como Thread
+	 * Metodo de ejecucion continua como Thread
 	 */
 	public void run() {
-		// Bucle infinito de ejecución para la obtención de mensajes del buffer para enviarlos.
+		Message outputMsg;
+		
+		// Bucle infinito de ejecucion que obtiene mensajes del buffer y los saca por la red.
 		while (true) {
-			this.message = new Message();
+			outputMsg = new Message(); // Limpiar el mensaje anterior con un objeto nuevo
 			
-			// Intentar conseguir un mensaje de la red
+			// Intentar conseguir un mensaje del buffer
 			try {
-				this.message = this.bufferCommands.get();
+				outputMsg = this.bufferCommands.get();
 			} catch (InterruptedException e) {
+				System.err.println("Error al obtener un mensaje desde el buffer de comandos: "+e.getMessage());
 				e.printStackTrace();
 			}
 			
-			// Comprobar que el tipo es el esperado.
-			/*
-			 *  TODO: Aquí se realizará una comprobación más exahustiva de los parámetros necesarios
-			 *  en cada tipo de trama a enviar, antes de ser enviada.
-			 *  
-			 *  Además, es donde se espera que se realice la conversión al formato binario final.
-			 */
-			if (this.message.getType() == Message.TYPE_MSG) {
-				try {
-					// TODO: Hacer la conversion antes de enviar
-					this.netInterface.send("/MSG;" + this.message.getNick() + ";" + this.message.getRoom() + ";" + this.message.getMessage());
-				} catch (IllegalStateException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
+			if (this.hiloPadre.DEBUG) {
+				outputMsg.showDebug();
+			}
+			
+			// Comprobar que es v�lido y enviarlo.
+			try {
+				if (outputMsg.esValido()) {
+					this.protocolConverter.sendMessage(outputMsg);
 				}
+			} catch(IOException e){
+				System.err.println("Error al enviar el mensaje a la red: "+e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}

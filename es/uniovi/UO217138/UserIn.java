@@ -22,16 +22,16 @@ import java.io.InputStreamReader;
  * al hilo de salida de red mediante el buffer de comandos
  */
 public class UserIn extends Thread {
+	private ChatIRC hiloPadre;
 	private BufferFifo bufferCommands;
 	private BufferedReader input;
-	private String nick;
 	
 	/*
 	 * Constructor de la clase UserIn
 	 */
-	public UserIn (BufferFifo bufferCommands, String nick) {
+	public UserIn(BufferFifo bufferCommands, ChatIRC principal) {
+		this.hiloPadre = principal;
 		this.bufferCommands = bufferCommands;
-		this.nick = nick;
 		this.input =  new BufferedReader(new InputStreamReader(System.in));
 	}
 	
@@ -57,14 +57,19 @@ public class UserIn extends Thread {
 			if (textReaded.length() > 0) {
 				// Crear el mensaje
 				message.setType(Message.TYPE_MSG);
-				message.setRoom("pruebas");
-				message.setNick(this.nick);
-				message.setMessage(textReaded);
+				message.setPacket(Message.PKT_CMD);
+				
+				String[] args = new String[3];
+				args[0]=this.hiloPadre.nick;
+				args[1]=this.hiloPadre.room;
+				args[2]=textReaded;
+				message.setArgs(args);
 				
 				try {
 					// Meter el mensaje en el buffer de comandos
 					this.bufferCommands.put(message);
 				} catch(InterruptedException e) {
+					System.err.println("Error al enviar el paquete al buffer de comandos: "+e.getMessage());
 					e.printStackTrace();
 				}
 			}

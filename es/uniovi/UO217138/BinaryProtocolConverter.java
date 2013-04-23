@@ -152,7 +152,7 @@ public class BinaryProtocolConverter {
 		// Codificar los argumentos
 		for (int n = 0; n < args.length; n++) {
 			argsBytes[n] = args[n].getBytes("UTF-8");
-			sizeLoad += (2+argsBytes.length);
+			sizeLoad += (2+argsBytes[n].length);
 		}
 		
 		// Escritura en el Stream

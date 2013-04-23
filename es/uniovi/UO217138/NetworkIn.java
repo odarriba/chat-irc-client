@@ -10,7 +10,8 @@
  *  - Estefania Gonzalez
  */
 package es.uniovi.UO217138;
-import java.util.StringTokenizer;
+import java.net.Socket;
+import java.io.IOException;
 
 /*
  * Clase NetworkIn
@@ -20,70 +21,57 @@ import java.util.StringTokenizer;
  * e introducirlos dentro del buffer de respuestas.
  */
 public class NetworkIn extends Thread {
+	private ChatIRC hiloPadre;
 	private BufferFifo bufferResponses;
-	private Message message;
-	private Network netInterface;
+	private Socket socket;
+	private BinaryProtocolConverter protocolConverter;
 
 	/*
 	 * Constructor de la clase NetworkIn
 	 */
-	public NetworkIn(BufferFifo bufferResponses, Network netInterface) {
+	public NetworkIn(BufferFifo bufferResponses, Socket netInterface, ChatIRC principal) {
+		this.hiloPadre = principal;
 		this.bufferResponses = bufferResponses;
-		this.netInterface = netInterface;
+		this.socket = netInterface;
+		
+		try {
+			this.protocolConverter = new BinaryProtocolConverter(this.socket.getInputStream());
+		} catch (IOException e) {
+			System.err.println("Error al obtener el stream de entrada de la red: "+e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	/*
 	 * M�todo de ejecuci�n cont�nua como Thread
 	 */
 	public void run() {
-		String netData; // Datos obtenidos desde la red
+		Message inputMsg; // Mensaje obtenido desde la red
 		
 		while (true) {
-			netData = "";
+			inputMsg = new Message(); // Limpiar el mensaje y asegurar que no se repitan mensajes ante entradas no v�lidas
 			
 			try {
 				// Intentar obtener un paquete de la red
-				netData = this.netInterface.recv();
-			} catch (IllegalStateException e1) {
-				e1.printStackTrace();
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
+				inputMsg = this.protocolConverter.getMessage();
+			} catch (IOException e) {
+				System.err.println("Error al obtener el mensaje desde la red: "+e.getMessage());
+				e.printStackTrace();
+			}
+			
+			if (this.hiloPadre.DEBUG) {
+				inputMsg.showDebug();
 			}
 
-			this.message = new Message(); // Iniciar el objeto que contendrá los datos en el buffer
-			
-			/*
-			 * A partir de este punto es código que sólo sirve en este primer momento, sin tener
-			 * en cuenta el formato de paquete binario ni los diferentes mensajes, que tendrían
-			 * que ser tratados para ser encapsulados dentro de la clase Message.
-			 * 
-			 * TODO: Cambiar el código para adaptarlo a las especificaciones finales.
-			 */
-			StringTokenizer st = new StringTokenizer(netData, ";");
-
-			// Se debe comprobar que se reciben 3 o más parámetros
-			st.nextToken();
-			if (st.countTokens() >= 3) {
-				
-				// TODO: Cambiar la creación de mensajes
-				
-//				this.message.setType(Message.TYPE_MSG);
-//				this.message.setNick(st.nextToken());
-//				this.message.setRoom(st.nextToken());
-//				this.message.setMessage(st.nextToken());
-				
-				while (st.hasMoreTokens()) {
-					// Posibilidad de enviar mensajes con ';' en medio.
-					//this.message.setMessage(this.message.getMessage()+";"+st.nextToken());
+			try {
+				// Introducir el objeto en el buffer de respuestas (si es valido).
+				if (inputMsg.esValido()) {
+					this.bufferResponses.put(inputMsg);
 				}
-	
-				try {
-					// Introducir el objeto en el buffer de respuestas.
-					this.bufferResponses.put(this.message);
-				}
-				catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+			}
+			catch (InterruptedException e) {
+				System.err.println("Error al cargar el mensaje en el buffer de respuestas: "+e.getMessage());
+				e.printStackTrace();
 			}
 		}
 	}

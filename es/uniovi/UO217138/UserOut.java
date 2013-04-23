@@ -19,12 +19,14 @@ package es.uniovi.UO217138;
  * informaci—n pertinente.
  */
 public class UserOut extends Thread {
+	private ChatIRC hiloPadre;
 	private BufferFifo bufferResponses;
 	
 	/*
 	 * Constructor de la clase UserOut
 	 */
-	public UserOut (BufferFifo bufferResponses) {
+	public UserOut (BufferFifo bufferResponses, ChatIRC principal) {
+		this.hiloPadre = principal;
 		this.bufferResponses = bufferResponses;
 	}
 	
@@ -47,7 +49,7 @@ public class UserOut extends Thread {
 			// Procesamiento de la respuesta
 			if (message.getType() == Message.TYPE_MSG) {
 				// Si es de tipo MSG, imprimir el texto
-				System.out.println(message.getRoom()+"|"+message.getNick()+">"+message.getMessage());
+				//System.out.println(message.getRoom()+"|"+message.getNick()+">"+message.getMessage());
 			}
 		}
 	}

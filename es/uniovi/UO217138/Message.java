@@ -19,6 +19,7 @@ import java.util.Date;
  */
 public class Message {
 	/* Tipos de mensajes que se pueden enviar/recibir */
+	public static final byte TYPE_MISC	= 0x00;
 	public static final byte TYPE_MSG 	= 0x01;
 	public static final byte TYPE_JOIN 	= 0x02;
 	public static final byte TYPE_LEAVE = 0x03;
@@ -26,6 +27,7 @@ public class Message {
 	public static final byte TYPE_QUIT 	= 0x05;
 	public static final byte TYPE_LIST 	= 0x10;
 	public static final byte TYPE_WHO 	= 0x11;
+	public static final byte TYPE_HELLO	= 0x20;
 	
 	/* Tipos de paquetes posibles */
 	public static final byte PKT_CMD 	= 0x00;
@@ -61,6 +63,8 @@ public class Message {
 		
 		/* Comprobar que sea de uno de los tipos de mensaje disponibles */
 		switch(type){
+			case TYPE_MISC:
+				break;
 			case TYPE_MSG:
 				break;
 			case TYPE_JOIN:
@@ -74,6 +78,8 @@ public class Message {
 			case TYPE_WHO:
 				break;
 			case TYPE_QUIT:
+				break;
+			case TYPE_HELLO:
 				break;
 			default:
 				validType = false;
@@ -121,7 +127,7 @@ public class Message {
 	}
 	
 	public boolean esValido() {
-		boolean valido = false;
+		boolean valido = true;
 		
 		/* Comprobar que sea de uno de los tipos paquetes disponibles */
 		switch(this.packet){
@@ -139,11 +145,13 @@ public class Message {
 		}
 		
 		if (valido == false) {
-			return false;
+			return valido;
 		}
 		
 		/* Comprobar que sea de uno de los tipos de mensaje disponibles */
 		switch(this.type){
+			case TYPE_MISC:
+				break;
 			case TYPE_MSG:
 				break;
 			case TYPE_JOIN:
@@ -158,11 +166,86 @@ public class Message {
 				break;
 			case TYPE_QUIT:
 				break;
+			case TYPE_HELLO:
+				break;
 			default:
 				valido = false;
 				break;
 		}
 		
 		return valido;
+	}
+	
+	public Date getTimeStamp() {
+		return this.timeStamp;
+	}
+	
+	public void showDebug() {
+		System.out.println("\n[DEBUG - Message]");
+		System.out.println(" Paquete con TimeStamp: "+this.getTimeStamp());
+		System.out.println(" ----------------------------------------");
+		System.out.print(" Tipo de paquete: ");
+		
+		switch(this.packet){
+		case PKT_CMD:
+			System.out.println("Command");
+			break;
+		case PKT_INF:
+			System.out.println("Info");
+			break;
+		case PKT_OK:
+			System.out.println("Okey");
+			break;
+		case PKT_ERR:
+			System.out.println("Error");
+			break;
+		default:
+			System.out.println("Desconocido");
+			break;
+		}
+		
+		System.out.print(" Tipo de mensaje: ");
+		
+		switch(this.type){
+			case TYPE_MISC:
+				System.out.println("Misc");
+				break;
+			case TYPE_MSG:
+				System.out.println("MSG");
+				break;
+			case TYPE_JOIN:
+				System.out.println("JOIN");
+				break;
+			case TYPE_LEAVE:
+				System.out.println("LEAVE");
+				break;
+			case TYPE_NICK:
+				System.out.println("NICK");
+				break;
+			case TYPE_LIST:
+				System.out.println("LIST");
+				break;
+			case TYPE_WHO:
+				System.out.println("WHO");
+				break;
+			case TYPE_QUIT:
+				System.out.println("QUIT");
+				break;
+			case TYPE_HELLO:
+				System.out.println("HELLO");
+				break;
+			default:
+				System.out.println("Desconocido");
+				break;
+		}
+		
+		String[] args = this.getArgs();
+		System.out.println(" Cantidad de argumentos: "+args.length);
+		
+		for (int n = 0; n < args.length; n++) {
+			System.out.println(" - Argumento "+(n+1)+": "+args[n]);
+		}
+		
+		System.out.println("[/DEBUG - Message]\n");
 	}
 }
