@@ -21,9 +21,9 @@ import java.io.IOException;
 public class ChatIRC {
 	public String server;
 	public Integer puerto;
-	public boolean DEBUG = true;
+	public Boolean DEBUG = false;
 	
-	public String room = new String();
+	public String room = new String("pruebas");
 	public String nick = new String();
 	
 	public ChatIRC(String nick, String server, Integer puerto) {

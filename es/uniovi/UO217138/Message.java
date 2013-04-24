@@ -38,7 +38,7 @@ public class Message {
 	
 	private byte type;
 	private byte packet;
-	private String[] args;
+	private String[] args = new String[0];
 	private Date timeStamp;
 	
 	/*
