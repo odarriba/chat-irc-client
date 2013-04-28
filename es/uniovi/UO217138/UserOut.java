@@ -11,11 +11,9 @@
  */
 package es.uniovi.UO217138;
 
-<<<<<<< HEAD
+
 import java.util.StringTokenizer;
 
-=======
->>>>>>> f09b9d53490859600461febf6f7a7e0b1d75852a
 /*
  * Clase UserOut
  * 
@@ -51,7 +49,7 @@ public class UserOut extends Thread {
 				e.printStackTrace();
 			}
 			
-<<<<<<< HEAD
+
 			String[] args = message.getArgs();
 			
 			
@@ -191,13 +189,13 @@ public class UserOut extends Thread {
 			
 			}
 			
-=======
+
 			// Procesamiento de la respuesta
 			if (message.getType() == Message.TYPE_MSG) {
 				// Si es de tipo MSG, imprimir el texto
 				//System.out.println(message.getRoom()+"|"+message.getNick()+">"+message.getMessage());
 			}
->>>>>>> f09b9d53490859600461febf6f7a7e0b1d75852a
+
 		}
 	}
 }
