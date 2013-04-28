@@ -52,6 +52,8 @@ public class UserOut extends Thread {
 			
 			
 			
+			
+			
 			switch(message.getType()){
 			case Message.TYPE_MSG:
 				//paquete del tipo mensaje
