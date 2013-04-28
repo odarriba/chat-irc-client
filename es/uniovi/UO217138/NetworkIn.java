@@ -48,7 +48,7 @@ public class NetworkIn extends Thread {
 	public void run() {
 		Message inputMsg; // Mensaje obtenido desde la red
 		
-		while (true) {
+		while (this.hiloPadre.ejecucion) {
 			inputMsg = new Message(); // Limpiar el mensaje y asegurar que no se repitan mensajes ante entradas no v‡lidas
 			
 			try {

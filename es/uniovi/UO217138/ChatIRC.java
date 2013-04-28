@@ -22,6 +22,7 @@ public class ChatIRC {
 	public String server;
 	public Integer puerto;
 	public Boolean DEBUG = false;
+	public Boolean ejecucion = true;
 	
 	public String room = new String("pruebas");
 	public String nick = new String();

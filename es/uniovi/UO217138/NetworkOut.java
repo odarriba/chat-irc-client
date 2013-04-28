@@ -48,7 +48,7 @@ public class NetworkOut extends Thread {
 		Message outputMsg;
 		
 		// Bucle infinito de ejecucion que obtiene mensajes del buffer y los saca por la red.
-		while (true) {
+		while (this.hiloPadre.ejecucion) {
 			outputMsg = new Message(); // Limpiar el mensaje anterior con un objeto nuevo
 			
 			// Intentar conseguir un mensaje del buffer

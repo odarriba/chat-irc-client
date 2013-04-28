@@ -41,7 +41,7 @@ public class UserIn extends Thread {
 	public void run() {
 		String textReaded;
 		
-		while(true) {
+		while(this.hiloPadre.ejecucion) {
 			textReaded = "";
 			
 			try {
@@ -159,6 +159,10 @@ public class UserIn extends Thread {
 		msgOut.setPacket(Message.PKT_CMD);
 		
 		insertMessage(msgOut);
+		
+		synchronized(this.hiloPadre.ejecucion) {
+			this.hiloPadre.ejecucion = false;
+		}
 	}
 	
 	private void sendMessage(String[] textArray) {

@@ -39,7 +39,7 @@ public class UserOut extends Thread {
 	public void run() {
 		Message message;
 		
-		while(true) {
+		while(this.hiloPadre.ejecucion) {
 			message = new Message();
 			
 			try {
