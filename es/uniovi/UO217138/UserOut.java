@@ -183,7 +183,8 @@ public class UserOut extends Thread {
 				// error delservidor	
 				}
 			break;
-					
+					 
+			
 			}
 			
 		}
