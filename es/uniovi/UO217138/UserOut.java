@@ -50,145 +50,191 @@ public class UserOut extends Thread {
 			}
 			
 			if (message.esValido()) {
-				String[] args = message.getArgs();
-			
 				switch(message.getType()) {
 					case Message.TYPE_MSG:
-						//paquete del tipo mensaje
-						if (message.getPacket() == Message.PKT_INF) {
-						//mensaje del servidor
-							System.out.println(args[1]+"|"+args[0]+">"+args[2]);
-						}else if (message.getPacket() == Message.PKT_ERR) {
-						// error delservidor	
-							System.out.println("ERROR - Error al enviar el mensaje: "+args[0]);
-						}
-						
+						processMsg(message);
 						break;
 			
 					case Message.TYPE_JOIN:
-						//paquete del tipo unirse a sala
-						if (message.getPacket() == Message.PKT_INF) {
-							System.out.println("El usuario "+ args[0]+" se ha unido a la sala "+args[1]);
-							//mensaje del servidor
-						}else if (message.getPacket() == Message.PKT_OK) {
-							//constestacion del servidor
-							System.out.println("Te has unido a la sala "+args[1]);
-							
-							// Actualizar la informacion de la sala actual
-							synchronized(this.hiloPadre.room) {
-								this.hiloPadre.room = args[1];
-							}
-						}else if (message.getPacket() == Message.PKT_ERR) {
-							// error del servidor	
-							System.out.println("ERROR - Error al unirse a la sala: "+args[0]);
-						}
-						
+						processJoin(message);
 						break;
 						
 					case Message.TYPE_LEAVE:
-						//paquete del tipo abandornar sala
-						if (message.getPacket() == Message.PKT_INF) {
-							System.out.println("El usuario "+ args[0]+" ha abandonado la sala "+args[1]);
-							//mensaje del servidor
-						}else if (message.getPacket() == Message.PKT_OK) {
-							System.out.println("Has abandonado la sala  "+args[1]);
-							//constestacion del servidor
-						}else if (message.getPacket() == Message.PKT_ERR) {
-							// error delservidor	
-							System.out.println("ERROR - Error al abandonar la sala: "+args[0]);
-						}
-						
+						processLeave(message);
 						break;
 						
 					case Message.TYPE_NICK:
-						//paquete del tipo cambio de nick
-						if (message.getPacket() == Message.PKT_INF) {
-							System.out.println("El usuario "+ args[0]+" ha cambiado su nick por "+args[1]);
-			
-							//mensaje del servidor
-						}else if (message.getPacket() == Message.PKT_OK) {
-							System.out.println("Se a realizado satisfactoriamente el cambio de nick de  "+ args[0]+" a "+args[1]);
-							
-							// Actualizar la informacion del nick actual
-							synchronized(this.hiloPadre.nick) {
-								this.hiloPadre.nick = args[1];
-							}
-							//constestacion del servidor
-						}else if (message.getPacket() == Message.PKT_ERR) {
-							// error delservidor	
-							System.out.println("ERROR - Error al cambiar de nick: "+args[0]);
-						}
-						
+						processNick(message);
 						break;
 						
 					case Message.TYPE_QUIT:
-						//paquete del tipo fon de conexion
-						if (message.getPacket() == Message.PKT_INF) {
-							System.out.println("El usuario "+ args[0]+" se ha deconectado");
-							//mensaje del servidor
-						}else if (message.getPacket() == Message.PKT_OK) {
-							System.out.println("Has finalizado la conexion");
-							//constestacion del servidor
-						}else if (message.getPacket() == Message.PKT_ERR) {
-							System.out.println("ERROR- Error al desconectarse: "+args[0]);
-							// error delservidor
-						}
-						
+						processQuit(message);
 						break;
 						
 					case Message.TYPE_LIST:
-						//paquete del tipo list de salas
-						if (message.getPacket() == Message.PKT_INF) {
-							StringTokenizer st= new StringTokenizer(args[0],";");
-							System.out.println("Las siguientes salas estan disponibles: ");
-								
-							while(st.hasMoreTokens()){
-								System.out.println(st.nextToken());
-							}
-							//constestacion del servidor
-						}else if (message.getPacket() == Message.PKT_ERR) {
-							System.out.println("ERROR - Error al pedir las salas actuales: "+args[0]);
-							// error delservidor	
-						}
-						
+						processList(message);
 						break;
 						
 					case Message.TYPE_WHO:
-						//paquete del tipo usuarios en sala
-						if (message.getPacket() == Message.PKT_OK) {
-							StringTokenizer st= new StringTokenizer(args[1],";");
-							System.out.println("En la sala "+args[0]+ "se encuentran los siguientes usuarios :");
-								
-							while(st.hasMoreTokens()){
-								System.out.println(st.nextToken());
-							}
-							//constestacion del servidor
-						}else if (message.getPacket() == Message.PKT_ERR) {
-							System.out.println("ERROR(tipo: lista de usuarios en sala): "+args[0]);
-							// error delservidor	
-						}
+						processWho(message);
 						
 						break;
 						
 					case Message.TYPE_HELLO:
-						//paquete del tipo mensaje de bienvenida del server
-						if (message.getPacket() == Message.PKT_OK) {
-							System.out.println("SERVER: "+args[0]);
-							//constestacion del servidor
-						}
-						
+						processHello(message);
 						break;
 						
 					case Message.TYPE_MISC:
-						//paquete del tipo demas errores
-						if (message.getPacket() == Message.PKT_ERR) {
-							System.out.println("ERROR(tipo: no especifico): "+args[0]);
-							// error delservidor	
-						}
-						
+						processMisc(message);
 						break;
 				}
 			}
+		}
+	}
+	
+	private void processMsg( Message message) {
+		String[] args = message.getArgs();
+		
+		//paquete del tipo mensaje
+		if (message.getPacket() == Message.PKT_INF) {
+		//mensaje del servidor
+			System.out.println(args[1]+"|"+args[0]+">"+args[2]);
+		}else if (message.getPacket() == Message.PKT_ERR) {
+		// error delservidor	
+			System.out.println("ERROR: Error al enviar el mensaje '"+args[0]+"'");
+		}
+	}
+	
+	private void processJoin (Message message) {
+		String[] args = message.getArgs();
+		
+		//paquete del tipo unirse a sala
+		if (message.getPacket() == Message.PKT_INF) {
+			System.out.println("El usuario "+ args[0]+" se ha unido a la sala "+args[1]);
+			//mensaje del servidor
+		}else if (message.getPacket() == Message.PKT_OK) {
+			// Notificar en la consola que se ha entrado en la sala
+			// TODO: Esto luego se har‡ desde donde se creen las pesta–as
+			hiloPadre.serverLogPrintln("INFO: Te has unido a la sala "+args[1]);
+			
+			// Actualizar la informacion de la sala actual
+			// TODO: Esto luego sobrar‡
+			synchronized(this.hiloPadre.room) {
+				this.hiloPadre.room = args[1];
+			}
+		}else if (message.getPacket() == Message.PKT_ERR) {
+			// Error del servidor	
+			hiloPadre.serverLogPrintln("ERROR: Error al unirse a la sala "+args[0]);
+		}
+	}
+	
+	private void processLeave (Message message) {
+		String[] args = message.getArgs();
+		
+		//paquete del tipo abandornar sala
+		if (message.getPacket() == Message.PKT_INF) {
+			hiloPadre.serverLogPrintln("INFO: El usuario "+ args[0]+" ha abandonado la sala "+args[1]);
+			//mensaje del servidor
+		}else if (message.getPacket() == Message.PKT_OK) {
+			hiloPadre.serverLogPrintln("INFO: Has abandonado la sala "+args[1]);
+			//constestacion del servidor
+		}else if (message.getPacket() == Message.PKT_ERR) {
+			// error del servidor	
+			hiloPadre.serverLogPrintln("ERROR: Error al abandonar la sala "+args[0]);
+		}
+	}
+	
+	private void processNick (Message message) {
+		String[] args = message.getArgs();
+		
+		//paquete del tipo cambio de nick
+		if (message.getPacket() == Message.PKT_INF) {
+			hiloPadre.serverLogPrintln("INFO: El usuario "+ args[0]+" ha cambiado su nick por "+args[1]);
+
+			//mensaje del servidor
+		}else if (message.getPacket() == Message.PKT_OK) {
+			hiloPadre.serverLogPrintln("INFO: Tu nick ha sido correctamente cambiado de "+ args[0]+" a "+args[1]);
+			
+			// Actualizar la informacion del nick actual
+			synchronized(this.hiloPadre.nick) {
+				this.hiloPadre.nick = args[1];
+			}
+			//constestacion del servidor
+		}else if (message.getPacket() == Message.PKT_ERR) {
+			// error del servidor	
+			hiloPadre.serverLogPrintln("ERROR: Error al cambiar el nick por "+args[0]);
+		}
+	}
+	
+	private void processQuit (Message message) {
+		String[] args = message.getArgs();
+		
+		//paquete del tipo fon de conexion
+		if (message.getPacket() == Message.PKT_INF) {
+			hiloPadre.serverLogPrintln("INFO: El usuario "+ args[0]+" se ha deconectado");
+			//mensaje del servidor
+		}else if (message.getPacket() == Message.PKT_OK) {
+			hiloPadre.serverLogPrintln("INFO: Has finalizado la conexion");
+			//constestacion del servidor
+		}else if (message.getPacket() == Message.PKT_ERR) {
+			hiloPadre.serverLogPrintln("ERROR: Error al desconectarse - "+args[0]);
+			// error del servidor
+		}
+	}
+	
+	private void processList (Message message) {
+		String[] args = message.getArgs();
+		
+		//paquete del tipo list de salas
+		if (message.getPacket() == Message.PKT_INF) {
+			StringTokenizer st= new StringTokenizer(args[0],";");
+			hiloPadre.serverLogPrintln("INFO: Las siguientes salas estan disponibles: ");
+				
+			while(st.hasMoreTokens()){
+				hiloPadre.serverLogPrintln(" - "+st.nextToken());
+			}
+			//constestacion del servidor
+		}else if (message.getPacket() == Message.PKT_ERR) {
+			hiloPadre.serverLogPrintln("ERROR: Error al pedir las salas actuales - "+args[0]);
+			// error del servidor	
+		}
+	}
+	
+	private void processWho (Message message) {
+		String[] args = message.getArgs();
+		
+		//paquete del tipo usuarios en sala
+		if (message.getPacket() == Message.PKT_OK) {
+			StringTokenizer st= new StringTokenizer(args[1],";");
+			hiloPadre.serverLogPrintln("INFO: En la sala "+args[0]+ "se encuentran los siguientes usuarios :");
+				
+			while(st.hasMoreTokens()){
+				hiloPadre.serverLogPrintln(" - "+st.nextToken());
+			}
+			//constestacion del servidor
+		}else if (message.getPacket() == Message.PKT_ERR) {
+			hiloPadre.serverLogPrintln("ERROR: Error al obtener los usuarios de la sala "+args[0]);
+			// error del servidor	
+		}
+	}
+	
+	private void processHello (Message message) {
+		String[] args = message.getArgs();
+		
+		//paquete del tipo mensaje de bienvenida del server
+		if (message.getPacket() == Message.PKT_OK) {
+			hiloPadre.serverLogPrintln("SERVER: "+args[0]);
+			//constestacion del servidor
+		}
+	}
+	
+	private void processMisc(Message message) {
+		String[] args = message.getArgs();
+		
+		//paquete del tipo demas errores
+		if (message.getPacket() == Message.PKT_ERR) {
+			hiloPadre.serverLogPrintln("ERROR: "+args[0]);
+			// error delservidor	
 		}
 	}
 }

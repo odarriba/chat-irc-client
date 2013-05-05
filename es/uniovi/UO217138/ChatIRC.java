@@ -22,9 +22,11 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
 /*
  * Clase ChatIRC
@@ -41,6 +43,8 @@ public class ChatIRC extends Thread {
 	
 	public String room = new String("pruebas");
 	public String nick = new String();
+	
+	private Interface mainWindow;
 	
 	public final ChatIRC mainObject;
 	
@@ -64,10 +68,10 @@ public class ChatIRC extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
-		Interface ventana = new Interface(this);
+		this.mainWindow = new Interface(this);
 		
-		System.out.println("ChatIRC v"+ChatIRC.version);
-		System.out.println("-------------------------");
+		serverLogPrintln("ChatIRC v"+ChatIRC.version);
+		serverLogPrintln("-------------------------");
 		
 		// Crear los buffers intermedios
 		BufferFifo bufferResponses = new BufferFifo(); // Buffer que almacena las respuestas que vienen de la red
@@ -79,7 +83,7 @@ public class ChatIRC extends Thread {
 		
 		// Crear interfaces de red y hilos de procesamiento
 		try {
-			System.out.print("INFO: Conectando a "+this.server+":"+this.port+"...");
+			serverLogPrint("INFO: Conectando a "+this.server+":"+this.port+"...");
 			Socket socket = new Socket(this.server, this.port);
 			
 			NetworkOut netOut = new NetworkOut(bufferCommands, socket, this);
@@ -95,17 +99,17 @@ public class ChatIRC extends Thread {
 			try {
 				msgHello = bufferResponses.get();
 			} catch(InterruptedException e){
-				System.err.println("Error!");
-				System.err.println("Error al conectar con el servidor: "+e.getMessage());
+				serverLogPrintln("Error! ");
+				serverLogPrintln("Consulte la consola para tener mas info al respecto.");
 				e.printStackTrace();
 			}
 			
 			if (msgHello.getPacket() == Message.PKT_OK && msgHello.getType() == Message.TYPE_HELLO) {
-				System.out.println("Listo!"); // Conexion correcta
+				serverLogPrintln("Listo!"); // Conexion correcta
 				
-				System.out.println("SERVER: "+msgHello.getArgs()[0]);
+				serverLogPrintln("SERVER: "+msgHello.getArgs()[0]);
 				// Fijacion inicial del nombre de usuario (nickname)
-				System.out.print("INFO: Intentando cambiar el nick a '"+this.nick+"'...");
+				serverLogPrint("INFO: Intentando cambiar el nick a '"+this.nick+"'...");
 				
 				Message msgNick = new Message();
 				msgNick.setPacket(Message.PKT_CMD);
@@ -115,10 +119,10 @@ public class ChatIRC extends Thread {
 				try {
 					// Meter el mensaje en el buffer de comandos
 					bufferCommands.put(msgNick);
-					System.out.println("Listo!");
+					serverLogPrintln("Listo!");
 				} catch(InterruptedException e) {
-					System.err.println("Error!");
-					System.err.println("Error al enviar el paquete al buffer de comandos: "+e.getMessage());
+					serverLogPrintln("Error!");
+					serverLogPrintln("Consulte la consola para tener mas info al respecto.");
 					e.printStackTrace();
 				}
 				
@@ -126,12 +130,46 @@ public class ChatIRC extends Thread {
 				userIn.start();
 			}
 			else {
-				System.err.println("Error: No se recibio el comando HELLO esperado.");
+				serverLogPrintln("ERROR: No se recibio el comando HELLO esperado.");
 			}
 		} catch (IOException e) {
-			System.err.println("Error al crear el socket: "+e.getMessage());
+			serverLogPrintln("ERROR: Error al crear el socket: "+e.getMessage());
+			serverLogPrintln("Consulte la consola para tener mas info al respecto.");
 			e.printStackTrace();
 		}
+	}
+	
+	/*
+	 * Funcion para imprimir texto en la consola de servidor.
+	 */
+	public void serverLogPrint(String text) {
+		final JTextArea txtServerLog = this.mainWindow.txtServer;
+		final String[] textFinal = new String[1];
+		
+		textFinal[0] = text;
+		
+		SwingUtilities.invokeLater(new Runnable() { 
+			public void run() {
+				txtServerLog.append(textFinal[0]);
+			}
+		});
+	}
+	
+	/*
+	 * Funcion para imprimir texto en la consola de servidor.
+	 * Finaliza con un salto de l’nea.
+	 */
+	public void serverLogPrintln(String text) {
+		final JTextArea txtServerLog = this.mainWindow.txtServer;
+		final String[] textFinal = new String[1];
+		
+		textFinal[0] = text+"\n";
+		
+		SwingUtilities.invokeLater(new Runnable() { 
+			public void run() {
+				txtServerLog.append(textFinal[0]);
+			}
+		});
 	}
 
 	/*
@@ -139,7 +177,7 @@ public class ChatIRC extends Thread {
 	 * la conexion y se recogen para la conexion.
 	 * Una vez que se tienen esos datos se lanza el hilo principal.
 	 */
-	public void createWelcomeScreen() {
+	private void createWelcomeScreen() {
 		// Final los objetos que seran accedidos desde las acciones
 		final JFrame welcomeScreen;
 		final JTextField txtServer;

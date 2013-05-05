@@ -25,10 +25,13 @@ import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import java.awt.Font;
 
 public class Interface {
 	private ChatIRC hiloPadre;
-	private JFrame window = new JFrame();
+	private JFrame window;
+	private JTree roomLists;
+	public JTextArea txtServer;
 
 	/**
 	 * Crear la ventana.
@@ -69,13 +72,14 @@ public class Interface {
 		panelServer.add(scrollServer, "1, 1, fill, fill");
 		
 		// Textarea de log del servidor
-		JTextArea txtServer = new JTextArea();
-		txtServer.setEditable(false);
-		scrollServer.setViewportView(txtServer);
+		this.txtServer = new JTextArea();
+		txtServer.setFont(new Font("Verdana", Font.PLAIN, 14));
+		this.txtServer.setEditable(false);
+		scrollServer.setViewportView(this.txtServer);
 		
 		// Lista de salas
-		JTree roomLists = new JTree();
-		roomLists.setModel(new DefaultTreeModel(
+		this.roomLists = new JTree();
+		this.roomLists.setModel(new DefaultTreeModel(
 			new DefaultMutableTreeNode("Salas") {
 				{
 					add(new DefaultMutableTreeNode("Uno"));
@@ -83,8 +87,8 @@ public class Interface {
 				}
 			}
 		));
-		roomLists.setRootVisible(false);
-		panelServer.add(roomLists, "3, 1, fill, fill");
+		this.roomLists.setRootVisible(false);
+		panelServer.add(this.roomLists, "3, 1, fill, fill");
 		
 		// Panel ingerior de la aplicacion
 		JPanel panelInferior = new JPanel();
