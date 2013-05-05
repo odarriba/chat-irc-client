@@ -175,6 +175,7 @@ public class Interface {
 		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Salas");
 		
 		for (int i = 0; i < rooms.length; i++) {
+			if (rooms[i].length()>0)
 			rootNode.add(new DefaultMutableTreeNode(rooms[i]));
 		}
 		

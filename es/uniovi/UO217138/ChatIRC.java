@@ -111,7 +111,7 @@ public class ChatIRC extends Thread {
 			try {
 				msgHello = this.bufferResponses.get();
 			} catch(InterruptedException e){
-				serverLogPrintln("Error! ");
+				serverLogPrint("Error! ");
 				serverLogPrintln("Consulte la consola para tener mas info al respecto.");
 				e.printStackTrace();
 			}
@@ -155,7 +155,7 @@ public class ChatIRC extends Thread {
 				serverLogPrintln("ERROR: No se recibio el comando HELLO esperado.");
 			}
 		} catch (IOException e) {
-			serverLogPrintln("ERROR: Error al crear el socket: "+e.getMessage());
+			serverLogPrintln("\nERROR: Error al crear el socket: "+e.getMessage());
 			serverLogPrintln("Consulte la consola para tener mas info al respecto.");
 			e.printStackTrace();
 		}

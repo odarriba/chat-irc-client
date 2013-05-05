@@ -192,6 +192,11 @@ public class UserOut extends Thread {
 		//paquete del tipo list de salas
 		if (message.getPacket() == Message.PKT_INF) {
 			final String[] rooms = args[0].split(";");
+			int num_salas = rooms.length;
+			
+			if (rooms[0].length() == 0) {
+				num_salas--;
+			}
 			
 			// Actualizar la lista cuando se pueda
 			SwingUtilities.invokeLater(new Runnable() { 
@@ -201,7 +206,7 @@ public class UserOut extends Thread {
 			});
 			
 			// Mostrar la informacion en la consola
-			hiloPadre.serverLogPrintln("INFO: Se ha recibido info de un total de "+rooms.length+" salas disponibles.");
+			hiloPadre.serverLogPrintln("INFO: Se ha recibido info de un total de "+num_salas+" salas disponibles.");
 			
 		}else if (message.getPacket() == Message.PKT_ERR) {
 			hiloPadre.serverLogPrintln("ERROR: Error al pedir las salas actuales - "+args[0]);
