@@ -19,10 +19,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTree;
 import javax.swing.JTabbedPane;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import java.awt.Dimension;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
 
 public class Interface {
 
@@ -57,69 +62,48 @@ public class Interface {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		// creacion de ventan
+		// Diseño de la ventana
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(new BorderLayout(0, 0));
-		//creacion de area de texto central
-		JTextArea txtmsg = new JTextArea();
-		frame.getContentPane().add(txtmsg, BorderLayout.CENTER);
 		
-		JPanel panelinferior = new JPanel();
-		frame.getContentPane().add(panelinferior, BorderLayout.SOUTH);
-		panelinferior.setLayout(new BorderLayout(0, 0));
+		// Zona central con pestañas
+		
+		
+		JPanel panelInferior = new JPanel();
+		frame.getContentPane().add(panelInferior, BorderLayout.SOUTH);
+		panelInferior.setLayout(new BorderLayout(5, 5));
+		
+		Border current = panelInferior.getBorder();
+		Border empty = new EmptyBorder(6, 6, 6, 6);
+		if (current == null) {
+			panelInferior.setBorder(empty);
+		} else {
+			panelInferior.setBorder(new CompoundBorder(empty, current));
+		}
 	
-		//creacion de boton enviar
-		JButton btnenviar = new JButton("ENVIAR");
+		// Creacion de boton enviar
+		JButton btnenviar = new JButton("Enviar >");
 		btnenviar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-				
-				//accion que se produce al apretar enviar
+				// Accion que se produce al apretar enviar
 			}
 		});
 		
-		panelinferior.add(btnenviar, BorderLayout.EAST);
-		//creacion de campo de entrada de texto
+		panelInferior.add(btnenviar, BorderLayout.EAST);
+		//Creacion de campo de entrada de texto
 		msg = new JTextField();
-		panelinferior.add(msg, BorderLayout.CENTER);
+		panelInferior.add(msg, BorderLayout.CENTER);
 		msg.setColumns(10);
-		//creacion de panel de comandos con scroll
-		String[] commandlist = {"/MSG","/JOIN","/LEAVE","/NICK","/QUIT", 
-				"/LIST","/WHO"}; 
-		JPanel paneldecomandos = new JPanel();
-		paneldecomandos.setMinimumSize(new Dimension(10, 40));
-		panelinferior.add(paneldecomandos, BorderLayout.WEST);
-		JList commando = new JList(commandlist);
-		paneldecomandos.add(commando);
-		commando.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION); 
-		commando.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		commando.setLayoutOrientation(JList.VERTICAL);
-		commando.setVisibleRowCount(1);
-		JScrollPane scrollPane = new JScrollPane(commando);
-		paneldecomandos.add(scrollPane);
-		//creacion de jtree
-		DefaultMutableTreeNode padre = new DefaultMutableTreeNode("servidor");
-		DefaultMutableTreeNode hijo1 = new DefaultMutableTreeNode("sala1");
-		DefaultMutableTreeNode hijo2 = new DefaultMutableTreeNode("sala2");
-		DefaultMutableTreeNode nieto1 = new DefaultMutableTreeNode("usuario1");
-		DefaultTreeModel modelo = new DefaultTreeModel(padre);
-		modelo.insertNodeInto(hijo1, padre, 0);
-		modelo.insertNodeInto(hijo2, padre, 1);
-		modelo.insertNodeInto(nieto1, hijo1, 0);
-	
-		JTree users = new JTree(modelo);
-		// en teoria deveria funcionar perro no me a�ade los nodos
-		frame.getContentPane().add(users, BorderLayout.EAST);
-	
-	
 		
-		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, BorderLayout.NORTH);
-		//creacion de panel para tabular conversaciones (tambien se podria hacer con el jtree haciendo doble click en la sala
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		panel.add(tabbedPane);
+		//creacion de panel de comandos con scroll
+		JComboBox comboBox = new JComboBox();
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"/MSG","/JOIN","/LEAVE","/NICK","/QUIT", 
+				"/LIST","/WHO"}));
+		panelInferior.add(comboBox, BorderLayout.WEST);
+		
+	
 	}
 
 }
