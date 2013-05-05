@@ -156,13 +156,14 @@ public class ChatIRC extends Thread {
 		// Etiqueta del campo de servidor (direccion y puerto)
 		lblServidor = new JLabel("Servidor");
 		lblServidor.setHorizontalAlignment(SwingConstants.RIGHT);
-		lblServidor.setFont(new Font("Verdana", Font.BOLD, 14));
+		lblServidor.setFont(new Font("Verdana", Font.PLAIN, 14));
 		lblServidor.setBounds(12, 53, 70, 15);
 		welcomeScreen.getContentPane().add(lblServidor);
 		
 		// Etiqueta del nick
 		lblNick = new JLabel("Nick");
 		lblNick.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblServidor.setFont(new Font("Verdana", Font.PLAIN, 14));
 		lblNick.setBounds(12, 88, 70, 15);
 		welcomeScreen.getContentPane().add(lblNick);
 		
