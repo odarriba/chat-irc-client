@@ -1,19 +1,11 @@
 package es.uniovi.UO217138;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
-import javax.swing.BoxLayout;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.JTextArea;
-import javax.swing.JList;
 import javax.swing.JButton;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.WindowConstants;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -25,36 +17,24 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import java.awt.Dimension;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.RowSpec;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 public class Interface {
-
-	private JFrame frame;
-	private JTextField msg;
-
-	/**
-	 * Launch the application.
-	 */
-	//esta iniciado aqui pero esto se puede transportar tanquilamente al hilo lanzador y meterlo como parametro  a user in y out
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Interface window = new Interface();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private ChatIRC hiloPadre;
+	private JFrame window = new JFrame();
 
 	/**
-	 * Create the application.
+	 * Crear la ventana.
 	 */
-	public Interface() {
+	public Interface(ChatIRC hiloPadre) {
+		this.hiloPadre = hiloPadre;
 		initialize();
 	}
 
@@ -62,21 +42,58 @@ public class Interface {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		// DiseÃ±o de la ventana
-		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 300);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.getContentPane().setLayout(new BorderLayout(0, 0));
+		// Dise–o de la ventana
+		window = new JFrame("ChatIRC - "+this.hiloPadre.server+":"+this.hiloPadre.port);
+		window.setBounds(100, 100, 715, 537);
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		// Zona central con pestaÃ±as
+		// Zona central con pesta–as
+		JTabbedPane panelTab = new JTabbedPane(JTabbedPane.TOP);
+		window.getContentPane().add(panelTab, BorderLayout.CENTER);
 		
+		// Pesta–a de servidor, con informaci—n de servicio y lista de salas
+		JPanel panelServer = new JPanel();
+		panelTab.addTab("Servidor", null, panelServer, null);
+		panelServer.setLayout(new FormLayout(new ColumnSpec[] {
+				ColumnSpec.decode("default:grow"),
+				FormFactory.LABEL_COMPONENT_GAP_COLSPEC,
+				ColumnSpec.decode("150px"),},
+			new RowSpec[] {
+				RowSpec.decode("default:grow"),}));
 		
+		// Scrollpane para la ventana de log de servidor
+		JScrollPane scrollServer = new JScrollPane();
+		scrollServer.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollServer.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		panelServer.add(scrollServer, "1, 1, fill, fill");
+		
+		// Textarea de log del servidor
+		JTextArea txtServer = new JTextArea();
+		txtServer.setEditable(false);
+		scrollServer.setViewportView(txtServer);
+		
+		// Lista de salas
+		JTree roomLists = new JTree();
+		roomLists.setModel(new DefaultTreeModel(
+			new DefaultMutableTreeNode("Salas") {
+				{
+					add(new DefaultMutableTreeNode("Uno"));
+					add(new DefaultMutableTreeNode("Dos"));
+				}
+			}
+		));
+		roomLists.setRootVisible(false);
+		panelServer.add(roomLists, "3, 1, fill, fill");
+		
+		// Panel ingerior de la aplicacion
 		JPanel panelInferior = new JPanel();
-		frame.getContentPane().add(panelInferior, BorderLayout.SOUTH);
+		window.getContentPane().add(panelInferior, BorderLayout.SOUTH);
 		panelInferior.setLayout(new BorderLayout(5, 5));
 		
+		// Margen para evitar estar pegado a los bordes de la ventana
 		Border current = panelInferior.getBorder();
-		Border empty = new EmptyBorder(6, 6, 6, 6);
+		Border empty = new EmptyBorder(0, 6, 6, 6);
 		if (current == null) {
 			panelInferior.setBorder(empty);
 		} else {
@@ -84,26 +101,33 @@ public class Interface {
 		}
 	
 		// Creacion de boton enviar
-		JButton btnenviar = new JButton("Enviar >");
-		btnenviar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				// Accion que se produce al apretar enviar
+		final JButton btnSend = new JButton("Enviar >");
+		btnSend.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// TODO: Accion que se produce al apretar enviar
+			}
+		});
+		panelInferior.add(btnSend, BorderLayout.EAST);
+		
+		// Creacion de campo de entrada de texto
+		final JTextField msg = new JTextField();
+		panelInferior.add(msg, BorderLayout.CENTER);
+		msg.setColumns(10);
+		msg.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// CUando se pulse enter en el campo de escritura, simular env’o con el boton
+				btnSend.doClick();
 			}
 		});
 		
-		panelInferior.add(btnenviar, BorderLayout.EAST);
-		//Creacion de campo de entrada de texto
-		msg = new JTextField();
-		panelInferior.add(msg, BorderLayout.CENTER);
-		msg.setColumns(10);
-		
-		//creacion de panel de comandos con scroll
+		// Creacion de panel de comandos con scroll
 		JComboBox comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"/MSG","/JOIN","/LEAVE","/NICK","/QUIT", 
 				"/LIST","/WHO"}));
 		panelInferior.add(comboBox, BorderLayout.WEST);
 		
-	
+		// Mostrar la ventana
+		this.window.setVisible(true);
 	}
 
 }

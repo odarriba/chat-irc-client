@@ -64,6 +64,8 @@ public class ChatIRC extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
+		Interface ventana = new Interface(this);
+		
 		System.out.println("ChatIRC v"+ChatIRC.version);
 		System.out.println("-------------------------");
 		
