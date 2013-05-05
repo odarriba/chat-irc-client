@@ -32,6 +32,8 @@ import javax.swing.SwingConstants;
  * esperando a la respuesta del usuario respecto a los datos de conexion.
  */
 public class ChatIRC extends Thread {
+	public final static String version = "1.0";
+	
 	public String server;
 	public Integer port;
 	public Boolean DEBUG = false;
@@ -53,7 +55,7 @@ public class ChatIRC extends Thread {
 	}
 	
 	public void run() {
-		System.out.println("ChatIRC v0.2 (hito 2)");
+		System.out.println("ChatIRC v"+ChatIRC.version);
 		System.out.println("-------------------------");
 		
 		// Crear los buffers intermedios
@@ -133,19 +135,19 @@ public class ChatIRC extends Thread {
 		final JSpinner slcPort;
 		JLabel lblServidor;
 		JLabel lblNick;
-		JButton btnConnect;
+		final JButton btnConnect;
 		JButton btnAbout;
 		JButton btnExit;
 		
 		// Crear la ventan principal
-		welcomeScreen = new JFrame("ChatIRC version 1.0");
+		welcomeScreen = new JFrame("ChatIRC version "+ChatIRC.version);
 		welcomeScreen.setResizable(false);
 		welcomeScreen.setSize(new Dimension(398, 187));
 		welcomeScreen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		welcomeScreen.getContentPane().setLayout(null);
 		
 		// Etiqueta del titulo
-		JLabel lblChatircVersion = new JLabel("ChatIRC version 1.0");
+		JLabel lblChatircVersion = new JLabel("ChatIRC version "+ChatIRC.version);
 		lblChatircVersion.setFont(new Font("Verdana", Font.BOLD, 16));
 		lblChatircVersion.setHorizontalAlignment(SwingConstants.CENTER);
 		lblChatircVersion.setBounds(12, 12, 372, 25);
@@ -182,6 +184,7 @@ public class ChatIRC extends Thread {
 		txtNick.setText("Usuario");
 		txtNick.setColumns(10);
 		txtNick.setBounds(100, 83, 274, 25);
+		
 		welcomeScreen.getContentPane().add(txtNick);
 		
 		// Boton de conectar
@@ -191,10 +194,18 @@ public class ChatIRC extends Thread {
 			public void actionPerformed(ActionEvent e) {
 				// Recoger la informacion, fijarla en los objetos necesarios
 				// y arrancar el resto del programa
+				
+				// Comprobacion de los datos
+				if (txtServer.getText().length() == 0){
+					JOptionPane.showMessageDialog(welcomeScreen, "Se debe introducir un servidor al que conectar", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				} else if (txtNick.getText().length() == 0){
+					JOptionPane.showMessageDialog(welcomeScreen, "Se debe introducir un nick para conectar", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				mainObject.server = txtServer.getText();
 				mainObject.port = (Integer)slcPort.getValue();
 				mainObject.nick = txtNick.getText();
-				
 				
 				welcomeScreen.setVisible(false);
 				welcomeScreen.dispose();
@@ -231,6 +242,23 @@ public class ChatIRC extends Thread {
 			}
 		});
 		welcomeScreen.getContentPane().add(btnExit);
+		
+		// Al pulsar enter mientras se escribe en algun campo, intentar
+		// enviar los datos
+		txtServer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Al pulsar enter, simular un click en el boton de conectar
+				// para proceder con la conexion
+				btnConnect.doClick();
+			}
+		});
+		txtNick.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Al pulsar enter, simular un click en el boton de conectar
+				// para proceder con la conexion
+				btnConnect.doClick();
+			}
+		});
 		
 		welcomeScreen.setVisible(true);
 	}
