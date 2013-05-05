@@ -44,9 +44,20 @@ public class ChatIRC extends Thread {
 	public String room = new String("pruebas");
 	public String nick = new String();
 	
-	private Interface mainWindow;
-	
+	public Interface mainWindow;
 	public final ChatIRC mainObject;
+	
+	// Hilos accesibles de E/S de mensajes
+	public UserOut userOut;
+	public UserIn userIn;
+	
+	// Hilos de red. No accesibles.
+	private NetworkOut netOut;
+	private NetworkIn netIn;
+	
+	// Buffers de mensajes. Privados.
+	private BufferFifo bufferResponses;
+	private BufferFifo bufferCommands; 
 	
 	public static void main(String[] args) {
 		new ChatIRC();
@@ -68,36 +79,37 @@ public class ChatIRC extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
+		// Crear los buffers intermedios
+		this.bufferResponses = new BufferFifo(); // Buffer que almacena las respuestas que vienen de la red
+		this.bufferCommands = new BufferFifo(); // Buffer que almacena los comandos del usuario
+				
+		// Crear hilos de E/S de mensajes
+		// Son accesibles para poder acceder hacia/desde la GUI
+		this.userOut = new UserOut(this.bufferResponses, this);
+		this.userIn = new UserIn(this.bufferCommands, this);
+				
 		this.mainWindow = new Interface(this);
 		
-		serverLogPrintln("ChatIRC v"+ChatIRC.version);
-		serverLogPrintln("-------------------------");
-		
-		// Crear los buffers intermedios
-		BufferFifo bufferResponses = new BufferFifo(); // Buffer que almacena las respuestas que vienen de la red
-		BufferFifo bufferCommands = new BufferFifo(); // Buffer que almacena los comandos del usuario
-		
-		// Crear hilos de interaccion con el usuario
-		UserOut userOut = new UserOut(bufferResponses, this);
-		UserIn userIn = new UserIn(bufferCommands, this);
+		serverLogPrintln("INFO: Ejecutando ChatIRC v"+ChatIRC.version);
+		serverLogPrintln("");
 		
 		// Crear interfaces de red y hilos de procesamiento
 		try {
 			serverLogPrint("INFO: Conectando a "+this.server+":"+this.port+"...");
 			Socket socket = new Socket(this.server, this.port);
 			
-			NetworkOut netOut = new NetworkOut(bufferCommands, socket, this);
-			NetworkIn netIn = new NetworkIn(bufferResponses, socket, this);
+			this.netOut = new NetworkOut(this.bufferCommands, socket, this);
+			this.netIn = new NetworkIn(this.bufferResponses, socket, this);
 
 			// Iniciar los hilos
-			netIn.start();
-			netOut.start();
+			this.netIn.start();
+			this.netOut.start();
 			
 			// Capturar el paquete inicial HELLO
 			Message msgHello = new Message();
 			
 			try {
-				msgHello = bufferResponses.get();
+				msgHello = this.bufferResponses.get();
 			} catch(InterruptedException e){
 				serverLogPrintln("Error! ");
 				serverLogPrintln("Consulte la consola para tener mas info al respecto.");
@@ -107,27 +119,37 @@ public class ChatIRC extends Thread {
 			if (msgHello.getPacket() == Message.PKT_OK && msgHello.getType() == Message.TYPE_HELLO) {
 				serverLogPrintln("Listo!"); // Conexion correcta
 				
+				// Arrancar el resto de hilos necesarios.
+				this.userOut.start();
+				this.userIn.start();
+				
 				serverLogPrintln("SERVER: "+msgHello.getArgs()[0]);
+				
 				// Fijacion inicial del nombre de usuario (nickname)
-				serverLogPrint("INFO: Intentando cambiar el nick a '"+this.nick+"'...");
+				serverLogPrintln("INFO: Intentando cambiar el nick a '"+this.nick+"'.");
 				
 				Message msgNick = new Message();
 				msgNick.setPacket(Message.PKT_CMD);
 				msgNick.setType(Message.TYPE_NICK);
 				msgNick.setArgs(new String[]{this.nick});
 				
+				// Solicitar informacion sobre las salas disponibles
+				serverLogPrintln("INFO: Solicitando info sobre las salas disponibles.");
+				
+				Message msgList = new Message();
+				msgList.setPacket(Message.PKT_CMD);
+				msgList.setType(Message.TYPE_LIST);
+				msgList.setArgs(new String[]{});
+				
 				try {
-					// Meter el mensaje en el buffer de comandos
-					bufferCommands.put(msgNick);
-					serverLogPrintln("Listo!");
+					// Meter los mensajes en el buffer de comandos
+					this.bufferCommands.put(msgNick);
+					this.bufferCommands.put(msgList);
 				} catch(InterruptedException e) {
-					serverLogPrintln("Error!");
+					serverLogPrintln("ERROR");
 					serverLogPrintln("Consulte la consola para tener mas info al respecto.");
 					e.printStackTrace();
 				}
-				
-				userOut.start();
-				userIn.start();
 			}
 			else {
 				serverLogPrintln("ERROR: No se recibio el comando HELLO esperado.");

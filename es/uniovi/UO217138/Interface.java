@@ -6,6 +6,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -16,6 +17,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -26,17 +28,25 @@ import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import java.awt.Font;
+import java.util.HashMap;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Interface {
 	private ChatIRC hiloPadre;
 	private JFrame window;
 	private JTree roomLists;
 	public JTextArea txtServer;
+	public HashMap<String, JTextArea> room2TextArea;
+	public HashMap<String, JTree> room2Users;
+	private JTabbedPane panelTab;
 
 	/**
 	 * Crear la ventana.
 	 */
 	public Interface(ChatIRC hiloPadre) {
+		this.room2TextArea = new HashMap<String, JTextArea>();
+		this.room2Users = new HashMap<String, JTree>();
 		this.hiloPadre = hiloPadre;
 		initialize();
 	}
@@ -45,6 +55,10 @@ public class Interface {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		// Variables final para usar en las clases anonimas que manejan
+		// los eventos
+		final UserIn userIn = this.hiloPadre.userIn;
+		
 		// Dise–o de la ventana
 		window = new JFrame("ChatIRC - "+this.hiloPadre.server+":"+this.hiloPadre.port);
 		window.setBounds(100, 100, 715, 537);
@@ -52,7 +66,7 @@ public class Interface {
 		window.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		// Zona central con pesta–as
-		JTabbedPane panelTab = new JTabbedPane(JTabbedPane.TOP);
+		panelTab = new JTabbedPane(JTabbedPane.TOP);
 		window.getContentPane().add(panelTab, BorderLayout.CENTER);
 		
 		// Pesta–a de servidor, con informaci—n de servicio y lista de salas
@@ -73,6 +87,7 @@ public class Interface {
 		
 		// Textarea de log del servidor
 		this.txtServer = new JTextArea();
+		txtServer.setLineWrap(true);
 		txtServer.setFont(new Font("Verdana", Font.PLAIN, 14));
 		this.txtServer.setEditable(false);
 		scrollServer.setViewportView(this.txtServer);
@@ -82,12 +97,30 @@ public class Interface {
 		this.roomLists.setModel(new DefaultTreeModel(
 			new DefaultMutableTreeNode("Salas") {
 				{
-					add(new DefaultMutableTreeNode("Uno"));
-					add(new DefaultMutableTreeNode("Dos"));
 				}
 			}
 		));
 		this.roomLists.setRootVisible(false);
+		// Al hacer doble click en una sala, se debe entrar a la misma.
+		this.roomLists.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2 && !e.isConsumed()) {
+					e.consume(); // Limpiar evento
+					
+					// Obtener el nodo seleccionado y su sala.
+					TreePath selPath = roomLists.getPathForLocation(e.getX(), e.getY());
+					DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)selPath.getLastPathComponent();
+					final String roomName = (String) selectedNode.getUserObject();
+					
+					// Enviar peticion de JOIN a esa sala.
+					SwingUtilities.invokeLater(new Runnable() { 
+						public void run() {
+							userIn.sendJoin(roomName);
+						}
+					});
+				}
+			}
+		});
 		panelServer.add(this.roomLists, "3, 1, fill, fill");
 		
 		// Panel ingerior de la aplicacion
@@ -134,4 +167,17 @@ public class Interface {
 		this.window.setVisible(true);
 	}
 
+	public void createRoom(String room) {
+		
+	}
+	
+	public void updateRoomList(String[] rooms) {
+		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Salas");
+		
+		for (int i = 0; i < rooms.length; i++) {
+			rootNode.add(new DefaultMutableTreeNode(rooms[i]));
+		}
+		
+		this.roomLists.setModel(new DefaultTreeModel(rootNode));
+	}
 }

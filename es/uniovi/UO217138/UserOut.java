@@ -14,6 +14,8 @@ package es.uniovi.UO217138;
 
 import java.util.StringTokenizer;
 
+import javax.swing.SwingUtilities;
+
 /*
  * Clase UserOut
  * 
@@ -101,7 +103,7 @@ public class UserOut extends Thread {
 			System.out.println(args[1]+"|"+args[0]+">"+args[2]);
 		}else if (message.getPacket() == Message.PKT_ERR) {
 		// error delservidor	
-			System.out.println("ERROR: Error al enviar el mensaje '"+args[0]+"'");
+			System.out.println("ERROR: Error al enviar el mensaje - "+args[0]);
 		}
 	}
 	
@@ -124,7 +126,7 @@ public class UserOut extends Thread {
 			}
 		}else if (message.getPacket() == Message.PKT_ERR) {
 			// Error del servidor	
-			hiloPadre.serverLogPrintln("ERROR: Error al unirse a la sala "+args[0]);
+			hiloPadre.serverLogPrintln("ERROR: Error al unirse a la sala - "+args[0]);
 		}
 	}
 	
@@ -140,7 +142,7 @@ public class UserOut extends Thread {
 			//constestacion del servidor
 		}else if (message.getPacket() == Message.PKT_ERR) {
 			// error del servidor	
-			hiloPadre.serverLogPrintln("ERROR: Error al abandonar la sala "+args[0]);
+			hiloPadre.serverLogPrintln("ERROR: Error al abandonar la sala - "+args[0]);
 		}
 	}
 	
@@ -162,7 +164,7 @@ public class UserOut extends Thread {
 			//constestacion del servidor
 		}else if (message.getPacket() == Message.PKT_ERR) {
 			// error del servidor	
-			hiloPadre.serverLogPrintln("ERROR: Error al cambiar el nick por "+args[0]);
+			hiloPadre.serverLogPrintln("ERROR: Error al cambiar el nick - "+args[0]);
 		}
 	}
 	
@@ -175,6 +177,7 @@ public class UserOut extends Thread {
 			//mensaje del servidor
 		}else if (message.getPacket() == Message.PKT_OK) {
 			hiloPadre.serverLogPrintln("INFO: Has finalizado la conexion");
+			
 			//constestacion del servidor
 		}else if (message.getPacket() == Message.PKT_ERR) {
 			hiloPadre.serverLogPrintln("ERROR: Error al desconectarse - "+args[0]);
@@ -184,16 +187,22 @@ public class UserOut extends Thread {
 	
 	private void processList (Message message) {
 		String[] args = message.getArgs();
+		final Interface mainWindow = hiloPadre.mainWindow;
 		
 		//paquete del tipo list de salas
 		if (message.getPacket() == Message.PKT_INF) {
-			StringTokenizer st= new StringTokenizer(args[0],";");
-			hiloPadre.serverLogPrintln("INFO: Las siguientes salas estan disponibles: ");
-				
-			while(st.hasMoreTokens()){
-				hiloPadre.serverLogPrintln(" - "+st.nextToken());
-			}
-			//constestacion del servidor
+			final String[] rooms = args[0].split(";");
+			
+			// Actualizar la lista cuando se pueda
+			SwingUtilities.invokeLater(new Runnable() { 
+				public void run() {
+					mainWindow.updateRoomList(rooms);
+				}
+			});
+			
+			// Mostrar la informacion en la consola
+			hiloPadre.serverLogPrintln("INFO: Se ha recibido info de un total de "+rooms.length+" salas disponibles.");
+			
 		}else if (message.getPacket() == Message.PKT_ERR) {
 			hiloPadre.serverLogPrintln("ERROR: Error al pedir las salas actuales - "+args[0]);
 			// error del servidor	
@@ -213,7 +222,7 @@ public class UserOut extends Thread {
 			}
 			//constestacion del servidor
 		}else if (message.getPacket() == Message.PKT_ERR) {
-			hiloPadre.serverLogPrintln("ERROR: Error al obtener los usuarios de la sala "+args[0]);
+			hiloPadre.serverLogPrintln("ERROR: Error al obtener los usuarios de la sala - "+args[0]);
 			// error del servidor	
 		}
 	}

@@ -35,7 +35,6 @@ public class Message {
 	public static final byte PKT_OK 	= 0x02;
 	public static final byte PKT_ERR 	= 0x03;
 	
-	
 	private byte type;
 	private byte packet;
 	private String[] args = new String[0];

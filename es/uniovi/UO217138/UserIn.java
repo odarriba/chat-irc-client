@@ -58,9 +58,6 @@ public class UserIn extends Thread {
 				if (textArray[0].toUpperCase().equals("/NICK")) {
 					sendNick(textArray);
 				}
-				else if (textArray[0].toUpperCase().equals("/JOIN")) {
-					sendJoin(textArray);
-				}
 				else if (textArray[0].toUpperCase().equals("/LEAVE")) {
 					sendLeave(textArray);
 				}
@@ -98,17 +95,12 @@ public class UserIn extends Thread {
 		insertMessage(msgOut);
 	}
 	
-	private void sendJoin(String[] textArray) {
+	public void sendJoin(String room) {
 		Message msgOut = new Message();
-		
-		if (textArray.length == 1) {
-			System.err.println("\n\nSintaxis de /JOIN:");
-			System.err.println("/JOIN <sala>\n");
-		}
 		
 		msgOut.setType(Message.TYPE_JOIN);
 		msgOut.setPacket(Message.PKT_CMD);
-		msgOut.setArgs(new String[]{textArray[1]});
+		msgOut.setArgs(new String[]{room});
 		
 		insertMessage(msgOut);
 	}
