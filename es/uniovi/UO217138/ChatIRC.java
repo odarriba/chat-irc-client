@@ -50,10 +50,19 @@ public class ChatIRC extends Thread {
 	}
 	
 	public ChatIRC() {
+		// Asignar el objeto actual a una variable final para ser
+		// accesible desde los eventos de la ventana de bienvenida
 		this.mainObject = this;
+		
+		// Mostrar la ventana de bienvenida
 		createWelcomeScreen();
 	}
 	
+	/*
+	 * Ejecutor del arranque de la aplicacion. Es llamado al arrancar
+	 * el hilo principal desde la ventana de bienvenida.
+	 * @see java.lang.Thread#run()
+	 */
 	public void run() {
 		System.out.println("ChatIRC v"+ChatIRC.version);
 		System.out.println("-------------------------");
@@ -62,7 +71,7 @@ public class ChatIRC extends Thread {
 		BufferFifo bufferResponses = new BufferFifo(); // Buffer que almacena las respuestas que vienen de la red
 		BufferFifo bufferCommands = new BufferFifo(); // Buffer que almacena los comandos del usuario
 		
-		// Crear hilos de interacci�n con el usuario
+		// Crear hilos de interaccion con el usuario
 		UserOut userOut = new UserOut(bufferResponses, this);
 		UserIn userIn = new UserIn(bufferCommands, this);
 		
@@ -115,7 +124,7 @@ public class ChatIRC extends Thread {
 				userIn.start();
 			}
 			else {
-				System.err.println("Error: No se recibi� el comando HELLO esperado.");
+				System.err.println("Error: No se recibio el comando HELLO esperado.");
 			}
 		} catch (IOException e) {
 			System.err.println("Error al crear el socket: "+e.getMessage());
@@ -126,6 +135,7 @@ public class ChatIRC extends Thread {
 	/*
 	 * Esta funcion crea la ventana de entrada donde se piden los datos para
 	 * la conexion y se recogen para la conexion.
+	 * Una vez que se tienen esos datos se lanza el hilo principal.
 	 */
 	public void createWelcomeScreen() {
 		// Final los objetos que seran accedidos desde las acciones
@@ -193,9 +203,6 @@ public class ChatIRC extends Thread {
 		btnConnect.setBounds(267, 120, 117, 25);
 		btnConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// Recoger la informacion, fijarla en los objetos necesarios
-				// y arrancar el resto del programa
-				
 				// Comprobacion de los datos
 				if (txtServer.getText().length() == 0){
 					JOptionPane.showMessageDialog(welcomeScreen, "Se debe introducir un servidor al que conectar", "Error", JOptionPane.ERROR_MESSAGE);
@@ -204,10 +211,14 @@ public class ChatIRC extends Thread {
 					JOptionPane.showMessageDialog(welcomeScreen, "Se debe introducir un nick para conectar", "Error", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
+				
+				// Recoger la informacion, fijarla en los objetos necesarios
+				// y arrancar el resto del programa
 				mainObject.server = txtServer.getText();
 				mainObject.port = (Integer)slcPort.getValue();
 				mainObject.nick = txtNick.getText();
 				
+				// Cerrar la ventana
 				welcomeScreen.setVisible(false);
 				welcomeScreen.dispose();
 				
@@ -261,6 +272,7 @@ public class ChatIRC extends Thread {
 			}
 		});
 		
+		// Finalmente, mostrar la ventana
 		welcomeScreen.setVisible(true);
 	}
 }
