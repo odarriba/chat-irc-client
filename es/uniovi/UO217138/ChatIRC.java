@@ -11,6 +11,7 @@
  */
 package es.uniovi.UO217138;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -46,7 +47,7 @@ public class ChatIRC extends Thread {
 	
 	public Interface mainWindow;
 	public final ChatIRC mainObject;
-	public HashMap<String, String[]> room2Users;
+	public HashMap<String, ArrayList<String>> room2Users;
 	
 	// Hilos accesibles de E/S de mensajes
 	public UserOut userOut;
@@ -90,7 +91,7 @@ public class ChatIRC extends Thread {
 		this.userIn = new UserIn(this.bufferCommands, this);
 		
 		// Hilo de estado de usuarios por sala
-		this.room2Users = new HashMap<String, String[]>();
+		this.room2Users = new HashMap<String, ArrayList<String>>();
 				
 		this.mainWindow = new Interface(this);
 		

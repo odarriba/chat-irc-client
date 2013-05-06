@@ -28,6 +28,7 @@ import com.jgoodies.forms.layout.RowSpec;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -37,6 +38,7 @@ public class Interface {
 	private JFrame window;
 	private JTree roomLists;
 	public JTextArea txtServer;
+	public HashMap<String, JPanel> room2Panel;
 	public HashMap<String, JTextArea> room2TextArea;
 	public HashMap<String, JTree> room2TreeUsers;
 	private JTabbedPane panelTab;
@@ -45,6 +47,7 @@ public class Interface {
 	 * Crear la ventana.
 	 */
 	public Interface(ChatIRC hiloPadre) {
+		this.room2Panel = new HashMap<String, JPanel>();
 		this.room2TextArea = new HashMap<String, JTextArea>();
 		this.room2TreeUsers = new HashMap<String, JTree>();
 		this.hiloPadre = hiloPadre;
@@ -109,15 +112,19 @@ public class Interface {
 					
 					// Obtener el nodo seleccionado y su sala.
 					TreePath selPath = roomLists.getPathForLocation(e.getX(), e.getY());
-					DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)selPath.getLastPathComponent();
-					final String roomName = (String) selectedNode.getUserObject();
 					
-					// Enviar peticion de JOIN a esa sala.
-					SwingUtilities.invokeLater(new Runnable() { 
-						public void run() {
-							userIn.sendJoin(roomName);
-						}
-					});
+					// Solo continuar si se pulso algun elemento
+					if (selPath != null) {
+						DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode)selPath.getLastPathComponent();
+						final String roomName = (String) selectedNode.getUserObject();
+						
+						// Enviar peticion de JOIN a esa sala.
+						SwingUtilities.invokeLater(new Runnable() { 
+							public void run() {
+								userIn.sendJoin(roomName);
+							}
+						});
+					}
 				}
 			}
 		});
@@ -207,6 +214,7 @@ public class Interface {
 		panelRoom.add(roomUsers, "3, 1, fill, fill");
 		
 		// Agregar las referncias a los HashMaps compartidos
+		this.room2Panel.put(room, panelRoom);
 		this.room2TextArea.put(room, txtRoom);
 		this.room2TreeUsers.put(room, roomUsers);
 		
@@ -218,16 +226,39 @@ public class Interface {
 		});
 	}
 	
-	public void print2Room(String room, String text) {
-		final String[] args = new String[]{room, text};
+	public void removeRoom(String room) {
+		final String[] roomName = new String[]{room};
+		
+		
+		// Agregar las referncias a los HashMaps compartidos
 		
 		SwingUtilities.invokeLater(new Runnable() { 
 			public void run() {
-				// Se carga la sala aqui porque esta en un objeto compartido que puede ser modificado/creado despues.
-				JTextArea txtRoom = room2TextArea.get(args[0]);
-				txtRoom.append(args[1]+"\n");
+				JPanel panel = room2Panel.get(roomName[0]);
+				// Eliminar los paneles de la UI y eliminar los elementos
+				panelTab.remove(panel);
+				
+				room2Panel.remove(roomName[0]);
+				room2TextArea.remove(roomName[0]);
+				room2TreeUsers.remove(roomName[0]);
 			}
 		});
+	}
+	
+	public void print2Room(String room, String text) {
+		final String[] args = new String[]{room, text};
+		
+		if (room2TextArea.get(room) != null) {
+			SwingUtilities.invokeLater(new Runnable() { 
+				public void run() {
+					// Se carga la sala aqui porque esta en un objeto compartido que puede ser modificado/creado despues.
+					JTextArea txtRoom = room2TextArea.get(args[0]);
+					txtRoom.append(args[1]+"\n");
+				}
+			});
+		} else {
+			this.hiloPadre.serverLogPrintln("ERROR: Se intenta escribir a una sala no existente.");
+		}
 	}
 	
 	public void updateRoomList(String[] rooms) {
@@ -245,19 +276,30 @@ public class Interface {
 		});
 	}
 	
-	public void setUsersRoom(String room, String[] users) {
+	public void setUsersRoom(String room, ArrayList<String> users) {
 		final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Usuarios");
 		final String[] arg = new String[]{room};
+		Object[] usersArray = users.toArray();
 		
-		for (int i = 0; i < users.length; i++) {
-			if (users[i].length()>0)
-			rootNode.add(new DefaultMutableTreeNode(users[i]));
+		for (int i = 0; i < usersArray.length; i++) {
+			if (((String)usersArray[i]).length() > 0) {
+				rootNode.add(new DefaultMutableTreeNode(usersArray[i]));
+			}
 		}
 		
 		SwingUtilities.invokeLater(new Runnable() { 
 			public void run() {
 				JTree usersRoom = room2TreeUsers.get(arg[0]);
 				usersRoom.setModel(new DefaultTreeModel(rootNode));
+			}
+		});
+	}
+	
+	public void closeWindow() {
+		SwingUtilities.invokeLater(new Runnable() { 
+			public void run() {
+				window.setVisible(false);
+				window.dispose();
 			}
 		});
 	}
