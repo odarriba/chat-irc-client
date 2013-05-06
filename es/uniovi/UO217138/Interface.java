@@ -178,48 +178,49 @@ public class Interface {
 		final String[] roomName = new String[]{room};
 		final JPanel panelRoom = new JPanel();
 		
-		// Configuracion del layout del panel de la nueva sala
-		panelRoom.setLayout(new FormLayout(new ColumnSpec[] {
-				ColumnSpec.decode("default:grow"),
-				FormFactory.LABEL_COMPONENT_GAP_COLSPEC,
-				ColumnSpec.decode("150px"),},
-				new RowSpec[] {
-				RowSpec.decode("default:grow"),
-		}));
-
-		// Scrollpane para el JTextArea de la sala
-		JScrollPane scrollRoom = new JScrollPane();
-		scrollRoom.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollRoom.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		// Adjuntar el panel de la sala
-		panelRoom.add(scrollRoom, "1, 1, fill, fill");
-
-		// Textarea de la sala
-		JTextArea txtRoom = new JTextArea();
-		txtRoom.setLineWrap(true);
-		txtRoom.setFont(new Font("Verdana", Font.PLAIN, 14));
-		txtRoom.setEditable(false);
-		scrollRoom.setViewportView(txtRoom);
-
-		// Lista de usuarios en la sala
-		JTree roomUsers = new JTree();
-		roomUsers.setModel(new DefaultTreeModel(
-			new DefaultMutableTreeNode("Usuarios") {
-				{
-				}
-			}
-		));
-		roomUsers.setRootVisible(false);
-		// Adjuntar al panel de la sala
-		panelRoom.add(roomUsers, "3, 1, fill, fill");
-		
-		// Agregar las referncias a los HashMaps compartidos
-		this.room2Panel.put(room, panelRoom);
-		this.room2TextArea.put(room, txtRoom);
-		this.room2TreeUsers.put(room, roomUsers);
-		
 		SwingUtilities.invokeLater(new Runnable() { 
 			public void run() {
+				// Configuracion del layout del panel de la nueva sala
+				panelRoom.setLayout(new FormLayout(new ColumnSpec[] {
+						ColumnSpec.decode("default:grow"),
+						FormFactory.LABEL_COMPONENT_GAP_COLSPEC,
+						ColumnSpec.decode("150px"),},
+						new RowSpec[] {
+						RowSpec.decode("default:grow"),
+				}));
+		
+				// Scrollpane para el JTextArea de la sala
+				JScrollPane scrollRoom = new JScrollPane();
+				scrollRoom.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+				scrollRoom.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+				// Adjuntar el panel de la sala
+				panelRoom.add(scrollRoom, "1, 1, fill, fill");
+		
+				// Textarea de la sala
+				JTextArea txtRoom = new JTextArea();
+				txtRoom.setLineWrap(true);
+				txtRoom.setFont(new Font("Verdana", Font.PLAIN, 14));
+				txtRoom.setEditable(false);
+				scrollRoom.setViewportView(txtRoom);
+		
+				// Lista de usuarios en la sala
+				JTree roomUsers = new JTree();
+				roomUsers.setModel(new DefaultTreeModel(
+					new DefaultMutableTreeNode("Usuarios") {
+						{
+						}
+					}
+				));
+				roomUsers.setRootVisible(false);
+				// Adjuntar al panel de la sala
+				panelRoom.add(roomUsers, "3, 1, fill, fill");
+				
+				// Agregar las referncias a los HashMaps compartidos
+				room2Panel.put(roomName[0], panelRoom);
+				room2TextArea.put(roomName[0], txtRoom);
+				room2TreeUsers.put(roomName[0], roomUsers);
+		
+		
 				// Se a–ade el panel a la GUI
 				panelTab.addTab(roomName[0], null, panelRoom, null);
 			}
