@@ -56,19 +56,22 @@ public class UserIn extends Thread {
 				String[] textArray = textReaded.split(" ");
 				
 				if (textArray[0].toUpperCase().equals("/NICK")) {
-					sendNick(textArray);
+					sendNick(textArray[1]);
 				}
 				else if (textArray[0].toUpperCase().equals("/LEAVE")) {
-					sendLeave(textArray);
+					sendLeave(textArray[1]);
 				}
 				else if (textArray[0].toUpperCase().equals("/LIST")) {
-					sendList(textArray);
+					sendList();
 				}
 				else if (textArray[0].toUpperCase().equals("/WHO")) {
-					sendWho(textArray);
+					sendWho(textArray[1]);
+				}
+				else if (textArray[0].toUpperCase().equals("/JOIN")) {
+					sendJoin(textArray[1]);
 				}
 				else if (textArray[0].toUpperCase().equals("/QUIT")) {
-					sendQuit(textArray);
+					sendQuit();
 				}
 				else if (textArray[0].toUpperCase().equals("/DEBUG")) {
 					changeDebug();
@@ -80,17 +83,17 @@ public class UserIn extends Thread {
 		}
 	}
 	
-	private void sendNick(String[] textArray) {
+	public void sendNick(String newNick) {
 		Message msgOut = new Message();
 		
-		if (textArray.length == 1) {
+		if (newNick.length() == 0) {
 			System.err.println("\n\nSintaxis de /NICK:");
 			System.err.println("/NICK <nuevonick>\n");
 		}
 		
 		msgOut.setType(Message.TYPE_NICK);
 		msgOut.setPacket(Message.PKT_CMD);
-		msgOut.setArgs(new String[]{textArray[1]});
+		msgOut.setArgs(new String[]{newNick});
 		
 		insertMessage(msgOut);
 	}
@@ -105,22 +108,22 @@ public class UserIn extends Thread {
 		insertMessage(msgOut);
 	}
 	
-	private void sendLeave(String[] textArray) {
+	public void sendLeave(String room) {
 		Message msgOut = new Message();
 		
-		if (textArray.length == 1) {
+		if (room.length() == 0) {
 			System.err.println("\n\nSintaxis de /LEAVE:");
 			System.err.println("/LEAVE <sala>\n");
 		}
 		
 		msgOut.setType(Message.TYPE_LEAVE);
 		msgOut.setPacket(Message.PKT_CMD);
-		msgOut.setArgs(new String[]{textArray[1]});
+		msgOut.setArgs(new String[]{room});
 		
 		insertMessage(msgOut);
 	}
 	
-	private void sendList(String[] textArray) {
+	public void sendList() {
 		Message msgOut = new Message();
 		
 		msgOut.setType(Message.TYPE_LIST);
@@ -129,22 +132,22 @@ public class UserIn extends Thread {
 		insertMessage(msgOut);
 	}
 	
-	private void sendWho(String[] textArray) {
+	public void sendWho(String room) {
 		Message msgOut = new Message();
 		
-		if (textArray.length == 1) {
+		if (room.length() == 0) {
 			System.err.println("\n\nSintaxis de /WHO:");
 			System.err.println("/WHO <sala>\n");
 		}
 		
 		msgOut.setType(Message.TYPE_WHO);
 		msgOut.setPacket(Message.PKT_CMD);
-		msgOut.setArgs(new String[]{textArray[1]});
+		msgOut.setArgs(new String[]{room});
 		
 		insertMessage(msgOut);
 	}
 	
-	private void sendQuit(String[] textArray) {
+	public void sendQuit() {
 		Message msgOut = new Message();
 		
 		msgOut.setType(Message.TYPE_QUIT);
@@ -157,7 +160,7 @@ public class UserIn extends Thread {
 		}
 	}
 	
-	private void sendMessage(String[] textArray) {
+	public void sendMessage(String[] textArray) {
 		Message msgOut = new Message();
 		String msg = "";
 		
@@ -174,7 +177,7 @@ public class UserIn extends Thread {
 		// Crear el mensaje
 		msgOut.setType(Message.TYPE_MSG);
 		msgOut.setPacket(Message.PKT_CMD);
-		msgOut.setArgs(new String[]{this.hiloPadre.room, msg});
+		msgOut.setArgs(new String[]{"SALA", msg});
 				
 		insertMessage(msgOut);
 	}

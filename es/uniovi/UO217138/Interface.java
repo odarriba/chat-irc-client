@@ -38,7 +38,7 @@ public class Interface {
 	private JTree roomLists;
 	public JTextArea txtServer;
 	public HashMap<String, JTextArea> room2TextArea;
-	public HashMap<String, JTree> room2Users;
+	public HashMap<String, JTree> room2TreeUsers;
 	private JTabbedPane panelTab;
 
 	/**
@@ -46,7 +46,7 @@ public class Interface {
 	 */
 	public Interface(ChatIRC hiloPadre) {
 		this.room2TextArea = new HashMap<String, JTextArea>();
-		this.room2Users = new HashMap<String, JTree>();
+		this.room2TreeUsers = new HashMap<String, JTree>();
 		this.hiloPadre = hiloPadre;
 		initialize();
 	}
@@ -168,17 +168,97 @@ public class Interface {
 	}
 
 	public void createRoom(String room) {
+		final String[] roomName = new String[]{room};
+		final JPanel panelRoom = new JPanel();
 		
+		// Configuracion del layout del panel de la nueva sala
+		panelRoom.setLayout(new FormLayout(new ColumnSpec[] {
+				ColumnSpec.decode("default:grow"),
+				FormFactory.LABEL_COMPONENT_GAP_COLSPEC,
+				ColumnSpec.decode("150px"),},
+				new RowSpec[] {
+				RowSpec.decode("default:grow"),
+		}));
+
+		// Scrollpane para el JTextArea de la sala
+		JScrollPane scrollRoom = new JScrollPane();
+		scrollRoom.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollRoom.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		// Adjuntar el panel de la sala
+		panelRoom.add(scrollRoom, "1, 1, fill, fill");
+
+		// Textarea de la sala
+		JTextArea txtRoom = new JTextArea();
+		txtRoom.setLineWrap(true);
+		txtRoom.setFont(new Font("Verdana", Font.PLAIN, 14));
+		txtRoom.setEditable(false);
+		scrollRoom.setViewportView(txtRoom);
+
+		// Lista de usuarios en la sala
+		JTree roomUsers = new JTree();
+		roomUsers.setModel(new DefaultTreeModel(
+			new DefaultMutableTreeNode("Usuarios") {
+				{
+				}
+			}
+		));
+		roomUsers.setRootVisible(false);
+		// Adjuntar al panel de la sala
+		panelRoom.add(roomUsers, "3, 1, fill, fill");
+		
+		// Agregar las referncias a los HashMaps compartidos
+		this.room2TextArea.put(room, txtRoom);
+		this.room2TreeUsers.put(room, roomUsers);
+		
+		SwingUtilities.invokeLater(new Runnable() { 
+			public void run() {
+				// Se a–ade el panel a la GUI
+				panelTab.addTab(roomName[0], null, panelRoom, null);
+			}
+		});
+	}
+	
+	public void print2Room(String room, String text) {
+		final String[] args = new String[]{room, text};
+		
+		SwingUtilities.invokeLater(new Runnable() { 
+			public void run() {
+				// Se carga la sala aqui porque esta en un objeto compartido que puede ser modificado/creado despues.
+				JTextArea txtRoom = room2TextArea.get(args[0]);
+				txtRoom.append(args[1]+"\n");
+			}
+		});
 	}
 	
 	public void updateRoomList(String[] rooms) {
-		DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Salas");
+		final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Salas");
 		
 		for (int i = 0; i < rooms.length; i++) {
 			if (rooms[i].length()>0)
 			rootNode.add(new DefaultMutableTreeNode(rooms[i]));
 		}
 		
-		this.roomLists.setModel(new DefaultTreeModel(rootNode));
+		SwingUtilities.invokeLater(new Runnable() { 
+			public void run() {
+				roomLists.setModel(new DefaultTreeModel(rootNode));
+			}
+		});
+	}
+	
+	public void setUsersRoom(String room, String[] users) {
+		final DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("Usuarios");
+		final String[] arg = new String[]{room};
+		
+		for (int i = 0; i < users.length; i++) {
+			if (users[i].length()>0)
+			rootNode.add(new DefaultMutableTreeNode(users[i]));
+		}
+		
+		SwingUtilities.invokeLater(new Runnable() { 
+			public void run() {
+				JTree usersRoom = room2TreeUsers.get(arg[0]);
+				usersRoom.setModel(new DefaultTreeModel(rootNode));
+			}
+		});
 	}
 }

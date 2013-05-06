@@ -112,18 +112,23 @@ public class UserOut extends Thread {
 		
 		//paquete del tipo unirse a sala
 		if (message.getPacket() == Message.PKT_INF) {
-			System.out.println("El usuario "+ args[0]+" se ha unido a la sala "+args[1]);
+			hiloPadre.mainWindow.print2Room(args[1], "INFO: El usuario "+ args[0]+" se ha unido a la sala.");
 			//mensaje del servidor
 		}else if (message.getPacket() == Message.PKT_OK) {
-			// Notificar en la consola que se ha entrado en la sala
-			// TODO: Esto luego se har‡ desde donde se creen las pesta–as
+			// Crear la sala en la UI
+			hiloPadre.mainWindow.createRoom(args[1]);
+			
+			// Notidicar en la sala y en el log de servidor que se ha entrado en la sala
+			hiloPadre.mainWindow.print2Room(args[1], "INFO: Te has unido a la sala "+args[1]);
 			hiloPadre.serverLogPrintln("INFO: Te has unido a la sala "+args[1]);
 			
-			// Actualizar la informacion de la sala actual
-			// TODO: Esto luego sobrar‡
-			synchronized(this.hiloPadre.room) {
-				this.hiloPadre.room = args[1];
-			}
+			// Enviar mensaje de WHO para ver los usuarios de la sala
+			hiloPadre.serverLogPrintln("INFO: Peticion de info sobre los usuarios de la sala '"+args[1]+"' enviada.");
+			hiloPadre.userIn.sendWho(args[1]);
+			
+			// Enviar mensaje LIST para actualizar la lista de salas.
+			hiloPadre.userIn.sendList();
+
 		}else if (message.getPacket() == Message.PKT_ERR) {
 			// Error del servidor	
 			hiloPadre.serverLogPrintln("ERROR: Error al unirse a la sala - "+args[0]);
@@ -187,7 +192,6 @@ public class UserOut extends Thread {
 	
 	private void processList (Message message) {
 		String[] args = message.getArgs();
-		final Interface mainWindow = hiloPadre.mainWindow;
 		
 		//paquete del tipo list de salas
 		if (message.getPacket() == Message.PKT_INF) {
@@ -199,17 +203,13 @@ public class UserOut extends Thread {
 			}
 			
 			// Actualizar la lista cuando se pueda
-			SwingUtilities.invokeLater(new Runnable() { 
-				public void run() {
-					mainWindow.updateRoomList(rooms);
-				}
-			});
+			this.hiloPadre.mainWindow.updateRoomList(rooms);
 			
 			// Mostrar la informacion en la consola
-			hiloPadre.serverLogPrintln("INFO: Se ha recibido info de un total de "+num_salas+" salas disponibles.");
+			this.hiloPadre.serverLogPrintln("INFO: Se ha recibido info de un total de "+num_salas+" salas disponibles.");
 			
 		}else if (message.getPacket() == Message.PKT_ERR) {
-			hiloPadre.serverLogPrintln("ERROR: Error al pedir las salas actuales - "+args[0]);
+			this.hiloPadre.serverLogPrintln("ERROR: Error al pedir las salas actuales - "+args[0]);
 			// error del servidor	
 		}
 	}
@@ -219,12 +219,14 @@ public class UserOut extends Thread {
 		
 		//paquete del tipo usuarios en sala
 		if (message.getPacket() == Message.PKT_OK) {
-			StringTokenizer st= new StringTokenizer(args[1],";");
-			hiloPadre.serverLogPrintln("INFO: En la sala "+args[0]+ "se encuentran los siguientes usuarios :");
-				
-			while(st.hasMoreTokens()){
-				hiloPadre.serverLogPrintln(" - "+st.nextToken());
+			String[] users = args[1].split(";");
+			
+			// Almacenar la lista recibida
+			synchronized (this.hiloPadre.mainObject.room2Users) {
+				this.hiloPadre.mainObject.room2Users.put(args[0], users);
 			}
+			
+			this.hiloPadre.mainWindow.setUsersRoom(args[0], users);
 			//constestacion del servidor
 		}else if (message.getPacket() == Message.PKT_ERR) {
 			hiloPadre.serverLogPrintln("ERROR: Error al obtener los usuarios de la sala - "+args[0]);
