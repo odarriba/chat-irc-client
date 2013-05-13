@@ -152,6 +152,11 @@ public class Interface {
 			}
 		});
 		panelInferior.add(btnSend, BorderLayout.EAST);
+		// Creacion de panel de comandos con scroll
+				final JComboBox comboBox = new JComboBox();
+				comboBox.setModel(new DefaultComboBoxModel(new String[] {"/MSG","/JOIN","/LEAVE","/NICK","/QUIT", 
+						"/LIST","/WHO"}));
+				panelInferior.add(comboBox, BorderLayout.WEST);
 		
 		// Creacion de campo de entrada de texto
 		final JTextField msg = new JTextField();
@@ -161,14 +166,58 @@ public class Interface {
 			public void actionPerformed(ActionEvent e) {
 				// CUando se pulse enter en el campo de escritura, simular env’o con el boton
 				btnSend.doClick();
+				// se obtiene lo que este marcado en combo box y se guarda en comando
+				String comando=(String)comboBox.getSelectedItem();
+				// el texto escrito tambien se guarda
+				String text = msg.getText();
+				
+				// se compara comando para saber que se quiere hacer
+
+					if (comando.toUpperCase().equals("/NICK")) {
+						if (text.length() > 0) {
+						hiloPadre.userIn.sendNick(text);
+						}
+					}
+					else if (comando.toUpperCase().equals("/LEAVE")) {
+						hiloPadre.userIn.sendLeave(text);
+					}
+					else if (comando.toUpperCase().equals("/LIST")) {
+						hiloPadre.userIn.sendList();
+					}
+					else if (comando.toUpperCase().equals("/WHO")) {
+						if (text.length() > 0) {
+						hiloPadre.userIn.sendWho(text);
+						}
+					}
+					else if (comando.toUpperCase().equals("/JOIN")) {
+						if (text.length() > 0) {
+						hiloPadre.userIn.sendJoin(text);
+						}
+					}
+					else if (comando.toUpperCase().equals("/QUIT")) {
+					
+						hiloPadre.userIn.sendQuit();
+					}
+					
+					else if(comando.toUpperCase().equals("/MSG")){
+						if (text.length() > 0) {
+						hiloPadre.userIn.sendMessage(text);
+						}
+					
+				}
+					
+				//volvemos a colocar la combo box a /MSG y ponemos vacio el esppacio de escribir
+				comboBox.setSelectedIndex(0);
+				msg.setText("");
+				
+				
+				
+				
+				
 			}
 		});
 		
-		// Creacion de panel de comandos con scroll
-		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"/MSG","/JOIN","/LEAVE","/NICK","/QUIT", 
-				"/LIST","/WHO"}));
-		panelInferior.add(comboBox, BorderLayout.WEST);
+		
 		
 		// Mostrar la ventana
 		this.window.setVisible(true);

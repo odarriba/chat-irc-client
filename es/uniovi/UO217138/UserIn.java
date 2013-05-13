@@ -77,7 +77,7 @@ public class UserIn extends Thread {
 					changeDebug();
 				}
 				else {
-					sendMessage(textArray);
+					sendMessage(textArray[1]);
 				}
 			}
 		}
@@ -160,20 +160,11 @@ public class UserIn extends Thread {
 		}
 	}
 	
-	public void sendMessage(String[] textArray) {
+	public void sendMessage(String textArray) {
 		Message msgOut = new Message();
 		String msg = "";
 		
-		for(int n=0; n< textArray.length; n++) {
-			if (n > 0 || textArray[n].toUpperCase().equals("/MSG") == false) {
-				msg = msg+textArray[n];
-				
-				if(n < (textArray.length-1)) {
-					msg = msg + " "; // A–adir el espacio intermedio entre palabras
-				}
-			}
-		}
-
+		
 		// Crear el mensaje
 		msgOut.setType(Message.TYPE_MSG);
 		msgOut.setPacket(Message.PKT_CMD);
