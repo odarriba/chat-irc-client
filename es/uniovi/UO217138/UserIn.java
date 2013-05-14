@@ -10,21 +10,18 @@
  *  - Estefania Gonzalez
  */
 package es.uniovi.UO217138;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 /*
  * Clase UserIn
  * 
  * Se encarga de procesar la entrada de teclado del usuario
- * y convertirla en un objeto de tipo Message que se enviar‡
+ * y convertirla en un objeto de tipo Message que se enviarï¿½
  * al hilo de salida de red mediante el buffer de comandos
  */
 public class UserIn extends Thread {
 	private ChatIRC hiloPadre;
 	private BufferFifo bufferCommands;
-	private BufferedReader input;
+	private BufferFifo bufferHilo;
 	
 	/*
 	 * Constructor de la clase UserIn
@@ -32,53 +29,23 @@ public class UserIn extends Thread {
 	public UserIn(BufferFifo bufferCommands, ChatIRC principal) {
 		this.hiloPadre = principal;
 		this.bufferCommands = bufferCommands;
-		this.input =  new BufferedReader(new InputStreamReader(System.in));
+		this.bufferHilo = new BufferFifo(100); // 5 veces el buffer de salida de red
 	}
 	
 	/*
-	 * Funci—n de ejecuci—n del Thread
+	 * Funciï¿½n de ejecuciï¿½n del Thread
 	 */
 	public void run() {
-		String textReaded;
+		Message msg;
 		
 		while(this.hiloPadre.ejecucion) {
-			textReaded = "";
-			
 			try {
-				// Leer una l’nea del teclado
-				textReaded = this.input.readLine();
-			} catch (IOException e) {
+				msg = this.bufferHilo.get();
+				// Meter el mensaje en el buffer de comandos
+				this.bufferCommands.put(msg);
+			} catch (InterruptedException e) {
+				System.err.println("Error al tratar mensaje de salida.");
 				e.printStackTrace();
-			}
-			
-			// Comprobar que se ha le’do texto
-			if (textReaded.length() > 0) {
-				String[] textArray = textReaded.split(" ");
-				
-				if (textArray[0].toUpperCase().equals("/NICK")) {
-					sendNick(textArray[1]);
-				}
-				else if (textArray[0].toUpperCase().equals("/LEAVE")) {
-					sendLeave(textArray[1]);
-				}
-				else if (textArray[0].toUpperCase().equals("/LIST")) {
-					sendList();
-				}
-				else if (textArray[0].toUpperCase().equals("/WHO")) {
-					sendWho(textArray[1]);
-				}
-				else if (textArray[0].toUpperCase().equals("/JOIN")) {
-					sendJoin(textArray[1]);
-				}
-				else if (textArray[0].toUpperCase().equals("/QUIT")) {
-					sendQuit();
-				}
-				else if (textArray[0].toUpperCase().equals("/DEBUG")) {
-					changeDebug();
-				}
-				else {
-					sendMessage(textArray[1]);
-				}
 			}
 		}
 	}
@@ -173,25 +140,12 @@ public class UserIn extends Thread {
 		insertMessage(msgOut);
 	}
 	
-	private void changeDebug() {
-		synchronized(this.hiloPadre.DEBUG) {
-			this.hiloPadre.DEBUG = !this.hiloPadre.DEBUG;
-		}
-		
-		if(this.hiloPadre.DEBUG) {
-			System.out.println("INFO: Modo debug activado.");
-		}
-		else {
-			System.out.println("INFO: Modo debug desactivado.");
-		}
-	}
-	
 	private void insertMessage(Message msg) {
 		try {
-			// Meter el mensaje en el buffer de comandos
-			this.bufferCommands.put(msg);
+			// Meter el mensaje en el buffer del hilo (gran capacidad)
+			this.bufferHilo.put(msg);
 		} catch(InterruptedException e) {
-			System.err.println("Error al enviar el paquete al buffer de comandos: "+e.getMessage());
+			System.err.println("Error al enviar el paquete al buffer interno del hilo: "+e.getMessage());
 			e.printStackTrace();
 		}
 	}
