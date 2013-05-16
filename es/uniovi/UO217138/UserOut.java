@@ -137,14 +137,6 @@ public class UserOut extends Thread {
 			// Crear la sala en la UI
 			hiloPadre.mainWindow.createRoom(args[1]);
 			
-			// Notidicar en la sala y en el log de servidor que se ha entrado en la sala
-			hiloPadre.mainWindow.print2Room(args[1], "INFO: Te has unido a la sala "+args[1]);
-			hiloPadre.serverLogPrintln("INFO: Te has unido a la sala "+args[1]);
-			
-			// Enviar mensaje de WHO para ver los usuarios de la sala
-			hiloPadre.serverLogPrintln("INFO: Peticion de info sobre los usuarios de la sala '"+args[1]+"' enviada.");
-			hiloPadre.userIn.sendWho(args[1]);
-			
 			// Enviar mensaje LIST para actualizar la lista de salas.
 			hiloPadre.userIn.sendList();
 
@@ -292,7 +284,7 @@ public class UserOut extends Thread {
 		String[] args = message.getArgs();
 		
 		//paquete del tipo list de salas
-		if (message.getPacket() == Message.PKT_INF) {
+		if (message.getPacket() == Message.PKT_OK) {
 			final String[] rooms = args[0].split(";");
 			int num_salas = rooms.length;
 			
@@ -361,7 +353,7 @@ public class UserOut extends Thread {
 		
 		//paquete del tipo demas errores
 		if (message.getPacket() == Message.PKT_ERR) {
-			hiloPadre.serverLogPrintln("ERROR: "+args[0]);
+			hiloPadre.serverLogPrintln("ERROR0: "+args[0]);
 			// error delservidor	
 		}
 	}

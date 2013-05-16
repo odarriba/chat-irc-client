@@ -41,7 +41,7 @@ public class Interface {
 	public HashMap<String, JPanel> room2Panel;
 	public HashMap<String, JTextArea> room2TextArea;
 	public HashMap<String, JTree> room2TreeUsers;
-	private JTabbedPane panelTab;
+	private final JTabbedPane panelTab = new JTabbedPane(JTabbedPane.TOP);
 
 	/**
 	 * Crear la ventana.
@@ -69,12 +69,11 @@ public class Interface {
 		window.getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		// Zona central con pesta–as
-		panelTab = new JTabbedPane(JTabbedPane.TOP);
 		window.getContentPane().add(panelTab, BorderLayout.CENTER);
 		
 		// Pesta–a de servidor, con informaci—n de servicio y lista de salas
 		JPanel panelServer = new JPanel();
-		panelTab.addTab("Servidor", null, panelServer, null);
+		panelTab.addTab("Log Servidor", null, panelServer, null);
 		panelServer.setLayout(new FormLayout(new ColumnSpec[] {
 				ColumnSpec.decode("default:grow"),
 				FormFactory.LABEL_COMPONENT_GAP_COLSPEC,
@@ -164,6 +163,14 @@ public class Interface {
 				// el texto escrito tambien se guarda
 				final String text = msg.getText();
 				
+				final String room = panelTab.getTitleAt(panelTab.getSelectedIndex());
+				
+				if (room.equals("Log Servidor") && (comando.toUpperCase().equals("/WHO") || comando.toUpperCase().equals("/MSG") || comando.toUpperCase().equals("/LEAVE"))){
+					// Los comandos /LEAVE, /WHO y /MSG dependen de la sala en la que se este,
+					// asi que no pueden ser llamados desde el log de servidor
+					return;
+				}
+				
 				// Enviar peticion a UserIn
 				SwingUtilities.invokeLater(new Runnable() { 
 					public void run() {
@@ -174,14 +181,14 @@ public class Interface {
 							}
 						}
 						else if (comando.toUpperCase().equals("/LEAVE")) {
-							hiloPadre.userIn.sendLeave(text);
+							hiloPadre.userIn.sendLeave(room);
 						}
 						else if (comando.toUpperCase().equals("/LIST")) {
 							hiloPadre.userIn.sendList();
 						}
 						else if (comando.toUpperCase().equals("/WHO")) {
 							if (text.length() > 0) {
-								hiloPadre.userIn.sendWho(text);
+								hiloPadre.userIn.sendWho(room);
 							}
 						}
 						else if (comando.toUpperCase().equals("/JOIN")) {
@@ -195,7 +202,7 @@ public class Interface {
 						
 						else if(comando.toUpperCase().equals("/MSG")){
 							if (text.length() > 0) {
-								hiloPadre.userIn.sendMessage(text);
+								hiloPadre.userIn.sendMessage(text, room);
 							}
 						}
 					}
@@ -266,9 +273,15 @@ public class Interface {
 				room2TextArea.put(roomName[0], txtRoom);
 				room2TreeUsers.put(roomName[0], roomUsers);
 		
-		
 				// Se a–ade el panel a la GUI
 				panelTab.addTab(roomName[0], null, panelRoom, null);
+				
+				// Notidicar en la sala y en el log de servidor que se ha entrado en la sala
+				hiloPadre.mainWindow.print2Room(roomName[0], "INFO: Te has unido a la sala "+roomName[0]);
+				hiloPadre.serverLogPrintln("INFO: Te has unido a la sala "+roomName[0]);
+				
+				// Enviar mensaje de WHO para ver los usuarios de la sala
+				hiloPadre.userIn.sendWho(roomName[0]);
 			}
 		});
 	}

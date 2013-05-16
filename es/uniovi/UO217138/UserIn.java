@@ -54,9 +54,11 @@ public class UserIn extends Thread {
 		Message msgOut = new Message();
 		
 		if (newNick.length() == 0) {
-			System.err.println("\n\nSintaxis de /NICK:");
-			System.err.println("/NICK <nuevonick>\n");
+			this.hiloPadre.serverLogPrintln("ERROR: Para cambiar el nick debes introducir uno nuevo primero.");
+			return;
 		}
+		
+		this.hiloPadre.serverLogPrintln("INFO: Enviado comando NICK para cambiar a "+newNick);
 		
 		msgOut.setType(Message.TYPE_NICK);
 		msgOut.setPacket(Message.PKT_CMD);
@@ -67,6 +69,13 @@ public class UserIn extends Thread {
 	
 	public void sendJoin(String room) {
 		Message msgOut = new Message();
+		
+		if (room.length() == 0) {
+			this.hiloPadre.serverLogPrintln("ERROR: No se han recibido los datos necesarios para enviar el comando JOIN.");
+			return;
+		}
+		
+		this.hiloPadre.serverLogPrintln("INFO: Enviado comando JOIN a la sala "+room);
 		
 		msgOut.setType(Message.TYPE_JOIN);
 		msgOut.setPacket(Message.PKT_CMD);
@@ -79,13 +88,16 @@ public class UserIn extends Thread {
 		Message msgOut = new Message();
 		
 		if (room.length() == 0) {
-			System.err.println("\n\nSintaxis de /LEAVE:");
-			System.err.println("/LEAVE <sala>\n");
+			this.hiloPadre.serverLogPrintln("ERROR: No se han recibido los datos necesarios para enviar el comando LEAVE.");
+			return;
 		}
 		
 		msgOut.setType(Message.TYPE_LEAVE);
 		msgOut.setPacket(Message.PKT_CMD);
 		msgOut.setArgs(new String[]{room});
+		
+		this.hiloPadre.serverLogPrintln("INFO: Enviado comando LEAVE de la sala "+room);
+		this.hiloPadre.mainWindow.print2Room(room,"INFO: Enviado comando LEAVE de la sala "+room);
 		
 		insertMessage(msgOut);
 	}
@@ -96,6 +108,8 @@ public class UserIn extends Thread {
 		msgOut.setType(Message.TYPE_LIST);
 		msgOut.setPacket(Message.PKT_CMD);
 		
+		this.hiloPadre.serverLogPrintln("INFO: Enviado comando LIST de info de salas");
+		
 		insertMessage(msgOut);
 	}
 	
@@ -103,9 +117,12 @@ public class UserIn extends Thread {
 		Message msgOut = new Message();
 		
 		if (room.length() == 0) {
-			System.err.println("\n\nSintaxis de /WHO:");
-			System.err.println("/WHO <sala>\n");
+			this.hiloPadre.serverLogPrintln("ERROR: No se han recibido los datos necesarios para enviar el comando WHO.");
+			return;
 		}
+		
+		this.hiloPadre.serverLogPrintln("INFO: Enviado comando WHO de la sala "+room);
+		this.hiloPadre.mainWindow.print2Room(room,"INFO: Enviado comando WHO de la sala "+room);
 		
 		msgOut.setType(Message.TYPE_WHO);
 		msgOut.setPacket(Message.PKT_CMD);
@@ -120,6 +137,8 @@ public class UserIn extends Thread {
 		msgOut.setType(Message.TYPE_QUIT);
 		msgOut.setPacket(Message.PKT_CMD);
 		
+		this.hiloPadre.serverLogPrintln("INFO: Enviado comando QUIT.");
+		
 		insertMessage(msgOut);
 		
 		synchronized(this.hiloPadre.ejecucion) {
@@ -127,15 +146,23 @@ public class UserIn extends Thread {
 		}
 	}
 	
-	public void sendMessage(String textArray) {
+	public void sendMessage(String msg, String room) {
 		Message msgOut = new Message();
-		String msg = "";
 		
+		if (msg.length() == 0) {
+			this.hiloPadre.mainWindow.print2Room(room,"ERROR: Para enviar un mensaje debes escribir algo primero.");
+			return;
+		}
+		
+		if (room.length() == 0) {
+			this.hiloPadre.serverLogPrintln("ERROR: No se han recibido los datos necesarios para enviar el comando MSG.");
+			return;
+		}
 		
 		// Crear el mensaje
 		msgOut.setType(Message.TYPE_MSG);
 		msgOut.setPacket(Message.PKT_CMD);
-		msgOut.setArgs(new String[]{"SALA", msg});
+		msgOut.setArgs(new String[]{room, msg});
 				
 		insertMessage(msgOut);
 	}
