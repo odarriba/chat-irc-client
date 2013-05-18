@@ -2,6 +2,8 @@ package es.uniovi.UO217138;
 
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
+
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JButton;
@@ -10,6 +12,9 @@ import javax.swing.SwingUtilities;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.JTree;
 import javax.swing.JTabbedPane;
 import javax.swing.border.Border;
@@ -65,8 +70,36 @@ public class Interface {
 		// Dise–o de la ventana
 		window = new JFrame("ChatIRC - "+this.hiloPadre.server+":"+this.hiloPadre.port);
 		window.setBounds(100, 100, 715, 537);
-		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		window.getContentPane().setLayout(new BorderLayout(0, 0));
+		
+		window.addWindowListener(new WindowAdapter() {                                                               
+			 
+			 
+            //This is the function that will be invoked when the user clicks on the close button (the X)
+            //At the end of this function , there will be no window on the screen , because we set in the 
+            //previous line the frame's defautl close operation to DisposeOnClose               
+
+            @Override                              
+            public void windowClosing(WindowEvent e) {
+                int confirmed = JOptionPane.showConfirmDialog(null,
+                        "ÀSeguro que quieres salir del chat?", "Confirmaci—n", JOptionPane.YES_NO_OPTION);
+                if (confirmed == JOptionPane.YES_OPTION) {
+                    window.dispose();
+                }
+            }
+
+            /*
+            This is the function that is invoked when the window is closed (i.e , immediatly after the previous 
+            function "windowClosing" exits). 
+                            If the frame's default closing operation was "EXIT_ON_CLOSE" , this function wouldn't run.
+            */
+            @Override
+            public void windowClosed(WindowEvent e) {
+            	// Enviar el QUIT para acabar con la ejecuci—n del resto de hilos
+                hiloPadre.userIn.sendQuit();
+            }
+        });
 		
 		// Zona central con pesta–as
 		window.getContentPane().add(panelTab, BorderLayout.CENTER);

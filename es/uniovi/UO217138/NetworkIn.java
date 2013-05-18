@@ -55,14 +55,12 @@ public class NetworkIn extends Thread {
 				// Intentar obtener un paquete de la red
 				inputMsg = this.protocolConverter.getMessage();
 			} catch (IOException e) {
-				System.err.println("Error al obtener el mensaje desde la red: "+e.getMessage());
-				e.printStackTrace();
+				// Si est‡ en proceso de cierre, ignorar los errores
+				if (this.hiloPadre.ejecucion) {
+					System.err.println("Error al obtener el mensaje desde la red: "+e.getMessage());
+					e.printStackTrace();
+				}
 			}
-			
-			if (this.hiloPadre.DEBUG) {
-				inputMsg.showDebug();
-			}
-
 			try {
 				// Introducir el objeto en el buffer de respuestas (si es valido).
 				if (inputMsg.esValido()) {
@@ -70,8 +68,11 @@ public class NetworkIn extends Thread {
 				}
 			}
 			catch (InterruptedException e) {
-				System.err.println("Error al cargar el mensaje en el buffer de respuestas: "+e.getMessage());
-				e.printStackTrace();
+				// Si est‡ en proceso de cierre, ignorar los errores
+				if (this.hiloPadre.ejecucion) {
+					System.err.println("Error al cargar el mensaje en el buffer de respuestas: "+e.getMessage());
+					e.printStackTrace();
+				}
 			}
 		}
 	}

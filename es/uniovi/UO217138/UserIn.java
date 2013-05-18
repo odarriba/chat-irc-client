@@ -44,8 +44,10 @@ public class UserIn extends Thread {
 				// Meter el mensaje en el buffer de comandos
 				this.bufferCommands.put(msg);
 			} catch (InterruptedException e) {
-				System.err.println("Error al tratar mensaje de salida.");
-				e.printStackTrace();
+				if (this.hiloPadre.ejecucion) {
+					System.err.println("Error al tratar mensaje de salida.");
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -140,10 +142,6 @@ public class UserIn extends Thread {
 		this.hiloPadre.serverLogPrintln("INFO: Enviado comando QUIT.");
 		
 		insertMessage(msgOut);
-		
-		synchronized(this.hiloPadre.ejecucion) {
-			this.hiloPadre.ejecucion = false;
-		}
 	}
 	
 	public void sendMessage(String msg, String room) {

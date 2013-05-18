@@ -57,6 +57,8 @@ public class ChatIRC extends Thread {
 	private NetworkOut netOut;
 	private NetworkIn netIn;
 	
+	private Socket socket; 
+	
 	// Buffers de mensajes. Privados.
 	private BufferFifo bufferResponses;
 	private BufferFifo bufferCommands; 
@@ -90,6 +92,9 @@ public class ChatIRC extends Thread {
 		this.userOut = new UserOut(this.bufferResponses, this);
 		this.userIn = new UserIn(this.bufferCommands, this);
 		
+		this.userIn.setDaemon(true);
+		this.userOut.setDaemon(true);
+		
 		// Hilo de estado de usuarios por sala
 		this.room2Users = new HashMap<String, ArrayList<String>>();
 				
@@ -101,10 +106,12 @@ public class ChatIRC extends Thread {
 		// Crear interfaces de red y hilos de procesamiento
 		try {
 			serverLogPrint("INFO: Conectando a "+this.server+":"+this.port+"...");
-			Socket socket = new Socket(this.server, this.port);
+			socket = new Socket(this.server, this.port);
 			
 			this.netOut = new NetworkOut(this.bufferCommands, socket, this);
 			this.netIn = new NetworkIn(this.bufferResponses, socket, this);
+			
+			this.netOut.setDaemon(true);
 
 			// Iniciar los hilos
 			this.netIn.start();
@@ -164,6 +171,31 @@ public class ChatIRC extends Thread {
 			serverLogPrintln("Consulte la consola para tener mas info al respecto.");
 			e.printStackTrace();
 		}
+	}
+	
+	/*
+	 * Funcion para cerrar los hilos en ejecucion y terminar el proceso
+	 */
+	public void closeThreads() {
+		// Se detienen los hilos que acaben ciclo
+		synchronized (this.ejecucion){
+			this.ejecucion = false;
+		}
+		
+		this.netIn.interrupt();
+		this.netOut.interrupt();
+		this.userIn.interrupt();
+		this.userOut.interrupt();
+		
+		// Se cierra el socket
+		try {
+			this.socket.close();
+		} catch (IOException e) {
+			System.err.println("Error al cerrar el socket.");
+			e.printStackTrace();
+		}
+		
+		// End of execution :)
 	}
 	
 	/*

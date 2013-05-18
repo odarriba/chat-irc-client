@@ -45,48 +45,52 @@ public class UserOut extends Thread {
 			try {
 				// Intentar obtener una respuesta del buffer
 				message = this.bufferResponses.get();
+			
+				if (message.esValido()) {
+					switch(message.getType()) {
+						case Message.TYPE_MSG:
+							processMsg(message);
+							break;
+				
+						case Message.TYPE_JOIN:
+							processJoin(message);
+							break;
+							
+						case Message.TYPE_LEAVE:
+							processLeave(message);
+							break;
+							
+						case Message.TYPE_NICK:
+							processNick(message);
+							break;
+							
+						case Message.TYPE_QUIT:
+							processQuit(message);
+							break;
+							
+						case Message.TYPE_LIST:
+							processList(message);
+							break;
+							
+						case Message.TYPE_WHO:
+							processWho(message);
+							
+							break;
+							
+						case Message.TYPE_HELLO:
+							processHello(message);
+							break;
+							
+						case Message.TYPE_MISC:
+							processMisc(message);
+							break;
+					}
+				}
 			} catch(InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			if (message.esValido()) {
-				switch(message.getType()) {
-					case Message.TYPE_MSG:
-						processMsg(message);
-						break;
-			
-					case Message.TYPE_JOIN:
-						processJoin(message);
-						break;
-						
-					case Message.TYPE_LEAVE:
-						processLeave(message);
-						break;
-						
-					case Message.TYPE_NICK:
-						processNick(message);
-						break;
-						
-					case Message.TYPE_QUIT:
-						processQuit(message);
-						break;
-						
-					case Message.TYPE_LIST:
-						processList(message);
-						break;
-						
-					case Message.TYPE_WHO:
-						processWho(message);
-						
-						break;
-						
-					case Message.TYPE_HELLO:
-						processHello(message);
-						break;
-						
-					case Message.TYPE_MISC:
-						processMisc(message);
-						break;
+				// Si est‡ en proceso de cierre, ignorar los errores
+				if (this.hiloPadre.ejecucion) {
+					System.err.println("Error al leer paquetes de la cola de entrada.");
+					e.printStackTrace();
 				}
 			}
 		}
@@ -246,7 +250,7 @@ public class UserOut extends Thread {
 	private void processQuit (Message message) {
 		String[] args = message.getArgs();
 		
-		//paquete del tipo fon de conexion
+		//paquete del tipo QUIT INF de desconexion de usuario
 		if (message.getPacket() == Message.PKT_INF) {
 			hiloPadre.serverLogPrintln("INFO: El usuario "+ args[0]+" se ha deconectado");
 			
@@ -267,9 +271,8 @@ public class UserOut extends Thread {
 			}
 			//mensaje del servidor
 		}else if (message.getPacket() == Message.PKT_OK) {
-			// Desconexion correcta. Cierre de la ventana.
-			hiloPadre.serverLogPrintln("INFO: Has finalizado la conexion");
-			hiloPadre.mainWindow.closeWindow();
+			// Desconexion correcta. Notificar al hilo Main
+			this.hiloPadre.closeThreads();
 		}else if (message.getPacket() == Message.PKT_ERR) {
 			hiloPadre.serverLogPrintln("ERROR: Error al desconectarse - "+args[0]);
 			// error del servidor

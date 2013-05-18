@@ -55,12 +55,11 @@ public class NetworkOut extends Thread {
 			try {
 				outputMsg = this.bufferCommands.get();
 			} catch (InterruptedException e) {
-				System.err.println("Error al obtener un mensaje desde el buffer de comandos: "+e.getMessage());
-				e.printStackTrace();
-			}
-			
-			if (this.hiloPadre.DEBUG) {
-				outputMsg.showDebug();
+				// Si est‡ en proceso de cierre, ignorar los errores
+				if (this.hiloPadre.ejecucion) {
+					System.err.println("Error al obtener un mensaje desde el buffer de comandos: "+e.getMessage());
+					e.printStackTrace();
+				}
 			}
 			
 			// Comprobar que es v‡lido y enviarlo.
@@ -69,8 +68,11 @@ public class NetworkOut extends Thread {
 					this.protocolConverter.sendMessage(outputMsg);
 				}
 			} catch(IOException e){
-				System.err.println("Error al enviar el mensaje a la red: "+e.getMessage());
-				e.printStackTrace();
+				// Si est‡ en proceso de cierre, ignorar los errores
+				if (this.hiloPadre.ejecucion) {
+					System.err.println("Error al enviar el mensaje a la red: "+e.getMessage());
+					e.printStackTrace();
+				}
 			}
 		}
 	}
