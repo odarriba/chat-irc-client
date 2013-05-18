@@ -77,6 +77,13 @@ public class UserIn extends Thread {
 			return;
 		}
 		
+		synchronized (this.hiloPadre.mainWindow.room2Panel) {
+			if (this.hiloPadre.mainWindow.room2Panel.containsKey(room)){
+				this.hiloPadre.serverLogPrintln("ERROR: No se puede hacer JOIN a una sala en la que ya estás.");
+				return;
+			}
+		}
+		
 		this.hiloPadre.serverLogPrintln("INFO: Enviado comando JOIN a la sala "+room);
 		
 		msgOut.setType(Message.TYPE_JOIN);
@@ -92,6 +99,13 @@ public class UserIn extends Thread {
 		if (room.length() == 0) {
 			this.hiloPadre.serverLogPrintln("ERROR: No se han recibido los datos necesarios para enviar el comando LEAVE.");
 			return;
+		}
+		
+		synchronized (this.hiloPadre.mainWindow.room2Panel) {
+			if (this.hiloPadre.mainWindow.room2Panel.containsKey(room) == false){
+				this.hiloPadre.serverLogPrintln("ERROR: No se puede hacer LEAVE a una sala en la que no estás.");
+				return;
+			}
 		}
 		
 		msgOut.setType(Message.TYPE_LEAVE);

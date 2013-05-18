@@ -201,6 +201,7 @@ public class Interface {
 				if (room.equals("Log Servidor") && (comando.toUpperCase().equals("/WHO") || comando.toUpperCase().equals("/MSG") || comando.toUpperCase().equals("/LEAVE"))){
 					// Los comandos /LEAVE, /WHO y /MSG dependen de la sala en la que se este,
 					// asi que no pueden ser llamados desde el log de servidor
+					hiloPadre.serverLogPrintln("ERROR: Comando no disponible en la consola de servidor.");
 					return;
 				}
 				
