@@ -221,9 +221,7 @@ public class Interface {
 							hiloPadre.userIn.sendList();
 						}
 						else if (comando.toUpperCase().equals("/WHO")) {
-							if (text.length() > 0) {
-								hiloPadre.userIn.sendWho(room);
-							}
+							hiloPadre.userIn.sendWho(room);
 						}
 						else if (comando.toUpperCase().equals("/JOIN")) {
 							if (text.length() > 0) {
@@ -375,7 +373,7 @@ public class Interface {
 		
 		for (int i = 0; i < usersArray.length; i++) {
 			if (((String)usersArray[i]).length() > 0) {
-				rootNode.add(new DefaultMutableTreeNode(usersArray[i]));
+				rootNode.add(new DefaultMutableTreeNode((String)usersArray[i]));
 			}
 		}
 		

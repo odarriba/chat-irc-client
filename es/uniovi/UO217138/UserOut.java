@@ -315,7 +315,7 @@ public class UserOut extends Thread {
 		String[] args = message.getArgs();
 		
 		//paquete del tipo usuarios en sala
-		if (message.getPacket() == Message.PKT_OK) {
+		if (message.getPacket() == Message.PKT_INF) {
 			String[] users = args[1].split(";");
 			ArrayList<String> usersList = new ArrayList<String>();
 			usersList.addAll(Arrays.asList(users));
