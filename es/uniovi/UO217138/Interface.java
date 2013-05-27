@@ -229,7 +229,11 @@ public class Interface {
 							}
 						}
 						else if (comando.toUpperCase().equals("/QUIT")) {
-								hiloPadre.userIn.sendQuit();
+							int confirmed = JOptionPane.showConfirmDialog(null,
+			                        "ÀSeguro que quieres salir del chat?", "Confirmaci—n", JOptionPane.YES_NO_OPTION);
+			                if (confirmed == JOptionPane.YES_OPTION) {
+			                    window.dispose();
+			                }
 						}
 						
 						else if(comando.toUpperCase().equals("/MSG")){
