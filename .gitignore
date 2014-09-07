@@ -1,9 +1,23 @@
+<<<<<<< HEAD
 [Tt]humbs.db
 *.DS_Store
 
 *.class
 
+=======
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+>>>>>>> e74d9dba3623966ece55d17b451d237fc6e4214c
 # Package Files #
 *.jar
 *.war
 *.ear
+<<<<<<< HEAD
+=======
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+>>>>>>> e74d9dba3623966ece55d17b451d237fc6e4214c
